@@ -21,6 +21,9 @@ import chromecast from "./chrome-cast.svg";
 import sliders04 from "./sliders-04.svg";
 import loading from "./loading.png";
 import background from "./background.jpg";
+import meditating from "./meditating.png";
+import moodtracking from "./moodtracking.png";
+import wellbeing from "./wellbeing.png";
 
 import curve from "./hero/curve.png";
 import robot from "./hero/robot.jpg";
@@ -44,6 +47,7 @@ import Minddoc from "./collaboration/Minddoc.png";
 import jour from "./collaboration/jour.png";
 import mylife from "./collaboration/mylife.png";
 import wysa from "./collaboration/wysa.png";
+
 
 import service1 from "./services/service-1.png";
 import service2 from "./services/service-2.png";
@@ -162,4 +166,7 @@ export {
   jour,
   mylife,
   wysa,
+  moodtracking,
+  wellbeing,
+  meditating,
 };
