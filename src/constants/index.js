@@ -52,8 +52,8 @@ import {
     },
     {
       id: "1",
-      title: "Features",
-      url: "#features",
+      title: "my group",
+      url: "#groupchat",
     },
     {
       id: "2",
@@ -67,12 +67,17 @@ import {
     },
     {
       id: "4",
+      title: "leaderboard",
+      url: "#leaderboard",
+    },
+    {
+      id: "5",
       title: "Sign Up",
       url: "#signup",
       onlyMobile: true,
     },
     {
-      id: "5",
+      id: "6",
       title: "Login",
       url: "#login",
       onlyMobile: true,

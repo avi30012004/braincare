@@ -2,7 +2,10 @@ import ButtonGradient from './assets/svg/ButtonGradient';
 import Benefits from './components/Benefits';
 import Collaboration from './components/Collabration';
 import AIChat from './components/AIChat';
+import Dashboard from './components/Dashboard';
+import GroupChat from './components/GroupChat';
 import Header from './components/Header';
+import Leaderboard from './components/Leaderboard';
 import Hero from './components/Hero';
 import Services from './components/Services';
 import Footer from './components/Footer';
@@ -24,6 +27,9 @@ const App = () => {
                 <Services />
               </>} />
               <Route path="/healbot" element={<AIChat />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/groupchat" element={<GroupChat />} />
           </Routes>
           <Footer />
         </div>
