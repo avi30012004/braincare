@@ -32,9 +32,9 @@ ${JSON.stringify(testAnswers)}
 
 Provide your assessment strictly as a JSON object with the following keys:
 - "stressLevel": A categorical stress level (e.g., "Low", "Moderate", "High", "Critical").
-- "summary": A brief (2-3 sentences) summary explaining the basis for the stress level assessment, referencing key aspects of the user's answers.
+- "summary": A detaied summary of the stress level, explaining the basis for the stress level assessment, referencing key aspects of the user's answers.
 - "recommendations": An array of 2-3 brief, actionable recommendations tailored to the assessed stress level.
-
+- "academic class schedules": a academic class schedules for this student.
 Do NOT include any markdown, comments, or additional explanations. Only return valid JSON.`;
 
 

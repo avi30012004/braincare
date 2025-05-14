@@ -2,37 +2,32 @@ import React, { useState } from 'react';
 
 // Define your stress assessment questions here
 const stressQuestions = [
-  // Work/Career
-  "Imagine you're facing a tight deadline at work with multiple projects demanding your attention. How do you typically react in such situations? Describe your physical sensations, thoughts, and behaviors.",
-  "Your boss just announced a major restructuring. How does this news make you feel? What steps would you take to cope with the uncertainty?",
-  "Describe a recent workplace conflict and how you handled it. How did you feel before, during, and after the conflict?",
-  "How often do you find yourself working overtime or bringing work home? How does this affect your personal life?",
-  "Do you feel appreciated and supported in your workplace? Why or why not?",
-
-  // Relationships
-  "Imagine your partner is constantly criticizing your habits. How would you address this situation? How would it make you feel?",
-  "You have a disagreement with a close friend. How do you typically handle such disagreements? What are your immediate and long-term reactions?",
-  "Your family is going through a difficult time. How do you provide support while also managing your own emotional well-being?",
-  "How often do you feel truly listened to and understood in your relationships? Can you give a recent example?",
-  "Do you feel you have a strong support system you can rely on during challenging times?",
+  // Academics
+  "Pop quiz! Three exams and a massive paper land on your doorstep the same week. Do you: a) Embrace the chaos, b) Strategically plan your survival, c) Hide under the covers and hope it all goes away?",
+  "That essay you poured your heart and soul into gets a grade that resembles your bank account balance after spring break. Your reaction: a) Professor feedback is my fuel! b) Time to drown my sorrows in pizza (and maybe revise later), c) Question the meaning of life (and grading rubrics).",
+  "Lost in lecture? Decoding ancient hieroglyphics would be easier than understanding this class. You: a) Form a study group and conquer together, b) Hit up office hours and charm the professor, c) Accept your fate and hope for a curve.",
 
   // Finances
-  "Imagine an unexpected expense arises, such as a car repair or medical bill. How would you react and manage the situation?",
-  "How often do you worry about money? Does this worry affect your sleep, appetite, or mood?",
-  "Do you feel in control of your finances? Why or why not?",
+  "Laptop meltdown! Right before a major deadline, your trusty tech companion decides to take an unscheduled vacation. You: a) Crowdfund a new one on campus, b) Become best friends with the library computers, c) Embrace the handwritten life (and pray for legible handwriting).",
+  "Part-time job offer: Extra cash or extra study time? That is the question. You: a) Master the art of time management and become a multitasking ninja, b) Sleep is for the weak (and the wealthy), c) Prioritize academics and hope for a scholarship miracle.",
 
-  // Health & Well-being
-  "You wake up feeling unwell. How does this impact your day? What steps do you take to care for yourself?",
-  "Describe your typical sleep patterns. Do you experience any difficulties falling asleep or staying asleep?",
-  "How often do you engage in activities that you find relaxing and enjoyable? What are those activities?",
-  "How would you describe your overall energy levels throughout the day?",
-  "Have you noticed any changes in your appetite or eating habits recently?",
+  // Social Life and Relationships
+  "FOMO alert! Everyone's at that party and you're stuck at home with a textbook. You: a) No biggie, my Netflix queue is calling my name, b) Crash the party and make a grand entrance, c) Wallow in self-pity and stalk everyone's Instagram stories.",
+  "Roommate drama! Passive-aggressive sticky notes are now the primary form of communication. You: a) Call a roommate summit and establish house rules, b) Invest in noise-canceling headphones and a personal stash of snacks, c) Plot elaborate pranks involving glitter and rubber ducks.",
 
-  // Follow-up questions
-  "How long have you been feeling this way?",
-  "What have you tried so far to manage these feelings?",
-  "What would make you feel less stressed?",
-  "On a scale of 1 to 10, with 1 being no stress and 10 being extreme stress, how would you rate your current stress level?"
+  // Physical and Mental Well-being
+  "Running on fumes and fueled by caffeine. You resemble a zombie more than a student. You: a) Schedule some me time and recharge, b) Embrace the chaos, it's just another Tuesday, c) Convince yourself that sleep is a social construct.",
+  "Stress levels are reaching Mount Everest proportions. You: a) Vent to friends and family – a problem shared is a problem halved, b) Hit the gym or find a quiet corner to meditate, c) Embrace the comfort of carbs and sugary treats.",
+  "Sleep? What's sleep? You’re more familiar with the campus library than your own bed. You: a) Try a sleep app and discover the magic of white noise, b) Invest in blackout curtains and earplugs – create a sleep sanctuary, c) Accept your fate and become a nocturnal creature.",
+
+  // General Stress and Coping
+  "Describe your typical day in the life of a college student using emojis only. 📚😴🍕🎉 stressed? 🤔😂😭",
+  "Your ultimate stress-busting superpower is: a) The ability to teleport to a deserted island, b) Unlimited access to ice cream and fuzzy socks, c) The power to pause time.",
+  "Code Red! Stress overload! Your first move is: a) Deep breaths and a calming mantra, b) Blast your favorite music and dance it out, c) Find the nearest cat and cuddle.",
+  "You conquered a stressful situation like a boss! Your secret weapon was: a) Careful planning and strategic execution, b) Sheer willpower and a never-give-up attitude, c) A healthy dose of luck and a sprinkle of divine intervention.",
+  "If you could snap your fingers and change one thing about college life to decrease stress, what would it be?"
+
+  // Note: The follow-up questions were removed to match the length of the new questions provided.
 ];
 
 const AIChat = () => {
