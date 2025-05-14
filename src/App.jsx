@@ -10,7 +10,11 @@ import Hero from './components/Hero';
 import Services from './components/Services';
 import Footer from './components/Footer';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import Sudoku from './components/Games/Sudoku';
 import { ClerkProvider } from "@clerk/clerk-react";
+import GamesAndTasks from './components/GamesAndTasks';
+import WordScramble from './components/Games/WordScramble';
+import MemoryMatch from './components/Games/MemoryMatch';
 
 const App = () => {
   const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -30,6 +34,10 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/groupchat" element={<GroupChat />} />
+              <Route path="/play" element={<GamesAndTasks />} />
+              <Route path="/games/sudoku" element={<Sudoku />} />
+              <Route path="/games/wordscramble" element={<WordScramble />} />
+              <Route path="/games/memorymatch" element={<MemoryMatch />} />
           </Routes>
           <Footer />
         </div>

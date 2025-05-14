@@ -72,12 +72,17 @@ import {
     },
     {
       id: "5",
+      title: "games and tasks",
+      url: "#play",
+    },
+    {
+      id: "6",
       title: "Sign Up",
       url: "#signup",
       onlyMobile: true,
     },
     {
-      id: "6",
+      id: "7",
       title: "Login",
       url: "#login",
       onlyMobile: true,
@@ -289,7 +294,7 @@ export const collabContent = [
       backgroundUrl: "./src/assets/benefits/card-4.svg",
       iconUrl: benefitIcon4,
       imageUrl: benefitImage2,
-      light: true,
+      light: true
     },
     {
       id: "4",
@@ -341,3 +346,69 @@ export const collabContent = [
       url: "#",
     },
   ];
+
+export const gamesAndTasks = [
+    {
+      id: "0",
+      name: "Sudoku",
+      description: "A classic puzzle game to boost cognitive function.",
+ stressLevel: "Low",
+ path: "/games/sudoku"
+    },
+    {
+      id: "1",
+      name: "Word Scramble / Anagram Challenge",
+      description: "Unscramble letters to find hidden words.",
+ stressLevel: "Low",
+ path: "/games/wordscramble"
+    },
+    {
+      id: "2",
+      name: "Memory Match Game",
+      description: "Test your memory by matching pairs of cards.",
+ stressLevel: "Low",
+ path: "/games/memorymatch"
+    },
+    {
+      id: "3",
+      name: "4-7-8 Breathing Guide",
+      description: "Follow a guided breathing exercise to calm your nervous system.",
+ stressLevel: "Medium",
+ path: "/games/breathingguide"
+    },
+    {
+      id: "4",
+      name: "Digital Doodle Pad",
+      description: "Express yourself creatively with a freeform drawing tool.",
+ stressLevel: "Medium",
+ path: "/games/doodlepad"
+    },
+    {
+      id: "5",
+      name: "Guided Journaling Prompt",
+      description: "Respond to AI-generated prompts for reflective writing.",
+ stressLevel: "Medium",
+ path: "/games/journaling"
+    },
+    {
+      id: "6",
+      name: "Serenity Clicker",
+      description: "Click to hear soothing sounds and receive calming quotes.",
+ stressLevel: "High",
+ path: "/games/serenityclicker"
+    },
+    {
+      id: "7",
+      name: "Mood Walk Simulation",
+      description: "Virtually experience a guided nature walk with calming visuals and audio.",
+ stressLevel: "High",
+ path: "/games/moodwalk"
+    },
+    {
+      id: "8",
+      name: "Emoji Emotion Board",
+      description: "Select emojis to represent your current feelings and get insights.",
+ stressLevel: "High",
+ path: "/games/emojiboard"
+    }
+];
