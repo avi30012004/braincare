@@ -15,6 +15,11 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import GamesAndTasks from './components/GamesAndTasks';
 import WordScramble from './components/Games/WordScramble';
 import MemoryMatch from './components/Games/MemoryMatch';
+import BreathingGuide from './components/Games/BreathingGuide';
+import DigitalDoodlePad from './components/Games/DigitalDoodlePad';
+import GuidedJournaling from './components/Games/Journaling';
+import SerenityClicker from './components/Games/SerenityClicker';
+import EmojiEmotionBoard from './components/Games/EmojiEmotionBoard';
 
 const App = () => {
   const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -38,6 +43,12 @@ const App = () => {
               <Route path="/games/sudoku" element={<Sudoku />} />
               <Route path="/games/wordscramble" element={<WordScramble />} />
               <Route path="/games/memorymatch" element={<MemoryMatch />} />
+              <Route path="/games/breathingguide" element={<BreathingGuide />} />
+              <Route path="/games/doodlepad" element={<DigitalDoodlePad />} />
+              <Route path="/games/journaling" element={<GuidedJournaling />} />
+              <Route path="/games/serenityclicker" element={<SerenityClicker />} />
+              <Route path="/games/emojiboard" element={<EmojiEmotionBoard />} />
+              
           </Routes>
           <Footer />
         </div>
