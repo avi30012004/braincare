@@ -2,62 +2,182 @@ import React, { useState } from 'react';
 
 // Define your stress assessment questions here
 const stressQuestions = [
-  // Academics
-  "Pop quiz! Three exams and a massive paper land on your doorstep the same week. Do you: a) Embrace the chaos, b) Strategically plan your survival, c) Hide under the covers and hope it all goes away?",
-  "That essay you poured your heart and soul into gets a grade that resembles your bank account balance after spring break. Your reaction: a) Professor feedback is my fuel! b) Time to drown my sorrows in pizza (and maybe revise later), c) Question the meaning of life (and grading rubrics).",
-  "Lost in lecture? Decoding ancient hieroglyphics would be easier than understanding this class. You: a) Form a study group and conquer together, b) Hit up office hours and charm the professor, c) Accept your fate and hope for a curve.",
-
-  // Finances
-  "Laptop meltdown! Right before a major deadline, your trusty tech companion decides to take an unscheduled vacation. You: a) Crowdfund a new one on campus, b) Become best friends with the library computers, c) Embrace the handwritten life (and pray for legible handwriting).",
-  "Part-time job offer: Extra cash or extra study time? That is the question. You: a) Master the art of time management and become a multitasking ninja, b) Sleep is for the weak (and the wealthy), c) Prioritize academics and hope for a scholarship miracle.",
-
-  // Social Life and Relationships
-  "FOMO alert! Everyone's at that party and you're stuck at home with a textbook. You: a) No biggie, my Netflix queue is calling my name, b) Crash the party and make a grand entrance, c) Wallow in self-pity and stalk everyone's Instagram stories.",
-  "Roommate drama! Passive-aggressive sticky notes are now the primary form of communication. You: a) Call a roommate summit and establish house rules, b) Invest in noise-canceling headphones and a personal stash of snacks, c) Plot elaborate pranks involving glitter and rubber ducks.",
-
-  // Physical and Mental Well-being
-  "Running on fumes and fueled by caffeine. You resemble a zombie more than a student. You: a) Schedule some me time and recharge, b) Embrace the chaos, it's just another Tuesday, c) Convince yourself that sleep is a social construct.",
-  "Stress levels are reaching Mount Everest proportions. You: a) Vent to friends and family – a problem shared is a problem halved, b) Hit the gym or find a quiet corner to meditate, c) Embrace the comfort of carbs and sugary treats.",
-  "Sleep? What's sleep? You’re more familiar with the campus library than your own bed. You: a) Try a sleep app and discover the magic of white noise, b) Invest in blackout curtains and earplugs – create a sleep sanctuary, c) Accept your fate and become a nocturnal creature.",
-
-  // General Stress and Coping
-  "Describe your typical day in the life of a college student using emojis only. 📚😴🍕🎉 stressed? 🤔😂😭",
-  "Your ultimate stress-busting superpower is: a) The ability to teleport to a deserted island, b) Unlimited access to ice cream and fuzzy socks, c) The power to pause time.",
-  "Code Red! Stress overload! Your first move is: a) Deep breaths and a calming mantra, b) Blast your favorite music and dance it out, c) Find the nearest cat and cuddle.",
-  "You conquered a stressful situation like a boss! Your secret weapon was: a) Careful planning and strategic execution, b) Sheer willpower and a never-give-up attitude, c) A healthy dose of luck and a sprinkle of divine intervention.",
-  "If you could snap your fingers and change one thing about college life to decrease stress, what would it be?"
-
-  // Note: The follow-up questions were removed to match the length of the new questions provided.
+  {
+    category: "School",
+    question: "Mega quiz attack! You have three tests and a huge paper due the same week. What do you do?",
+    options: [
+      { text: "a) Go with the flow – stress is for losers! (Maybe drink lots of soda.)", value: "a" },
+      { text: "b) Plan everything out – make a schedule, pull some all-nighters.", value: "b" },
+      { text: "c) Hide – maybe it will all magically disappear? (It won't.)", value: "c" },
+    ]
+  },
+  {
+    category: "School",
+    question: "Essay fail: Your amazing paper gets a bad grade. How do you react?",
+    options: [
+      { text: "a) Use the teacher's comments to make it better!", value: "a" },
+      { text: "b) Eat pizza and worry about it later.", value: "b" },
+      { text: "c) Freak out and question everything.", value: "c" },
+    ]
+  },
+  {
+    category: "School",
+    question: "Lost in class? The teacher might as well be speaking another language. You:",
+    options: [
+      { text: "a) Form a study group with your friends.", value: "a" },
+      { text: "b) Go to the teacher's office for help.", value: "b" },
+      { text: "c) Hope everyone else does badly so you don't look so bad.", value: "c" },
+    ]
+  },
+  {
+    category: "Money",
+    question: "Laptop disaster! Your computer breaks right before a big deadline. You:",
+    options: [
+      { text: "a) Ask people for money to buy a new one.", value: "a" },
+      { text: "b) Live at the library and use their computers.", value: "b" },
+      { text: "c) Write everything by hand and hope it's readable.", value: "c" },
+    ]
+  },
+  {
+    category: "Money",
+    question: "Part-time job offer: More money or more study time?",
+    options: [
+      { text: "a) Become a super-multitasker and do both!", value: "a" },
+      { text: "b) Forget sleep – I need the money!", value: "b" },
+      { text: "c) Focus on school and hope for a scholarship.", value: "c" },
+    ]
+  },
+  {
+    category: "Friends & Roommates",
+    question: "Fear of missing out! Everyone's at a party, but you have to study. You:",
+    options: [
+      { text: "a) Chill at home with Netflix – no big deal.", value: "a" },
+      { text: "b) Show up late and surprise everyone!", value: "b" },
+      { text: "c) Feel sorry for yourself and stalk everyone on Instagram.", value: "c" },
+    ]
+  },
+  {
+    category: "Friends & Roommates",
+    question: "Roommate trouble! You only communicate through angry sticky notes. You:",
+    options: [
+      { text: "a) Have a serious talk with your roommate.", value: "a" },
+      { text: "b) Hide in your room with snacks and headphones.", value: "b" },
+      { text: "c) Plan a funny prank to get back at them.", value: "c" },
+    ]
+  },
+  {
+    category: "Taking Care of Yourself",
+    question: "You're tired and wired on caffeine. You look like:",
+    options: [
+      { text: "a) A normal, slightly tired student.", value: "a" },
+      { text: "b) A zombie.", value: "b" },
+      { text: "c) Someone who doesn't need sleep (or food).", value: "c" },
+    ]
+  },
+  {
+    category: "Taking Care of Yourself",
+    question: "Super stressed! What do you do?",
+    options: [
+      { text: "a) Talk to friends, family, or a counselor.", value: "a" },
+      { text: "b) Do yoga, meditate, or take deep breaths.", value: "b" },
+      { text: "c) Eat lots of cookies and ice cream.", value: "c" },
+    ]
+  },
+  {
+    category: "Taking Care of Yourself",
+    question: "Sleep? What's that? You practically live at the library. You:",
+    options: [
+      { text: "a) Use a sleep app with calming sounds.", value: "a" },
+      { text: "b) Make your room super dark and quiet so you can sleep.", value: "b" },
+      { text: "c) Become a night owl and own it.", value: "c" },
+    ]
+  },
+  {
+    category: "Stress in General",
+    question: "Show your typical day as a college student using emojis:",
+    options: [] // This question will have a text input
+  },
+  {
+    category: "Stress in General",
+    question: "If you had a superpower to fight stress, it would be:",
+    options: [
+      { text: "a) Teleporting to a deserted island.", value: "a" },
+      { text: "b) Having unlimited ice cream and comfy socks.", value: "b" },
+      { text: "c) The ability to stop time.", value: "c" },
+    ]
+  },
+  {
+    category: "Stress in General",
+    question: "Stress emergency! What do you do first?",
+    options: [
+      { text: "a) Take deep breaths and tell yourself \"I can do this!\"", value: "a" },
+      { text: "b) Play loud music and dance.", value: "b" },
+      { text: "c) Cuddle with a cat.", value: "c" },
+    ]
+  },
+  {
+    category: "Stress in General",
+    question: "You beat a stressful situation! How did you do it?",
+    options: [
+      { text: "a) Careful planning and hard work.", value: "a" },
+      { text: "b) Never giving up!", value: "b" },
+      { text: "c) Pure luck.", value: "c" },
+    ]
+  },
+  {
+    category: "Stress in General",
+    question: "Snap your fingers! One thing you'd change about college to make it less stressful:",
+    options: [] // This question will have a text input
+  },
 ];
 
 const AIChat = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState(Array(stressQuestions.length).fill(''));
-  const [currentInput, setCurrentInput] = useState('');
-  const [assessmentComplete, setAssessmentComplete] = useState(false);
+  const [userAnswers, setUserAnswers] = useState(Array(stressQuestions.length).fill(null)); // Changed initial value to null
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [stressAssessmentResult, setStressAssessmentResult] = useState(null);
 
   const handleInputChange = (event) => {
     setCurrentInput(event.target.value);
+  }; // This input is not used for multiple choice
+
+  const handleOptionSelect = (optionValue) => {
+    const updatedAnswers = [...userAnswers];
+    updatedAnswers[currentQuestionIndex] = optionValue;
+    setUserAnswers(updatedAnswers);
   };
 
   const handleNextQuestion = () => {
-    const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQuestionIndex] = currentInput;
-    setUserAnswers(updatedAnswers);
-    setCurrentInput(''); // Clear input for next question
-
+    const updatedAnswers = [...userAnswers]; // Declare updatedAnswers here
+    // setCurrentInput(''); // This is for text input, not needed for multiple choice
     if (currentQuestionIndex < stressQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       // Optionally, pre-fill input if user already answered this question in a previous session
-      // setCurrentInput(userAnswers[currentQuestionIndex + 1] || '');
+      // handleTextAnswerChange({ target: { value: userAnswers[currentQuestionIndex + 1] || '' } }); // Re-apply text answer if exists
     } else {
-      // Last question answered, trigger assessment
+      // Last question answered, trigger assessment and mark assessment as complete
       setAssessmentComplete(true);
       analyzeStress(updatedAnswers);
     }
+  };
+
+  // Handle text input questions
+  const handleTextAnswerChange = (event) => {
+      const updatedAnswers = [...userAnswers];
+      updatedAnswers[currentQuestionIndex] = event.target.value;
+      setUserAnswers(updatedAnswers);
+  };
+
+  const currentQuestion = stressQuestions[currentQuestionIndex];
+  const assessmentComplete = currentQuestionIndex === stressQuestions.length; // Determine assessment completion based on index
+
+  const restartAssessment = () => {
+    setCurrentQuestionIndex(0);
+    setUserAnswers(Array(stressQuestions.length).fill(null)); // Reset to null
+    setCurrentInput(''); // This might not be needed anymore if not using text input
+    setStressAssessmentResult(null);
+    setError(null); // Also clear any previous errors on restart
   };
 
   const analyzeStress = async (answers) => {
@@ -114,29 +234,46 @@ const AIChat = () => {
           ></div>
         </div>
 
-        {!assessmentComplete ? (
+        {currentQuestionIndex < stressQuestions.length ? ( // Render questions if assessment not complete
           <div className='flex-1 overflow-y-auto py-8 px-10'>
             <div className='mb-4'>
               {/* Bot Message (Question) */}
-              <div className='flex justify-start items-start mb-4'>
+              <div className='flex justify-start items-start mb-6'>
                 <div className='bg-n-6 rounded-xl p-3 text-n-1 max-w-[80%]'>
                   <p className='text-xs text-n-1/50'>Healbot</p>
-                  <p className='font-code'>{stressQuestions[currentQuestionIndex]}</p>
+                  <p className='font-code'>{currentQuestion.question}</p>
                 </div>
               </div>
 
-              {/* User Input */}
-              <div className='flex justify-end items-end'>
-                <div className='w-full'>
-                  <input
-                    type='text'
-                    placeholder='Type your answer here...'
-                    className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1'
-                    value={currentInput}
-                    onChange={handleInputChange}
-                    onKeyPress={(event) => { if (event.key === 'Enter') handleNextQuestion(); }}
-                    disabled={isLoading} // Disable input while analyzing
-                  />
+              {/* User Options or Text Input */}
+              <div className='flex flex-col items-end'>
+                <div className='w-full max-w-[80%]'>
+                  {currentQuestion.options.length > 0 ? (
+                    // Multiple choice options
+                    <div className='flex flex-col space-y-3'>
+                      {currentQuestion.options.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleOptionSelect(option.value)}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-code ${userAnswers[currentQuestionIndex] === option.value ? 'bg-color-1 text-n-1' : 'bg-n-9 text-n-1/75 hover:bg-n-7'}`}
+                          disabled={isLoading}
+                        >
+                          {option.text}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    // Text input for open-ended questions
+                    <input
+                      type='text'
+                      placeholder='Type your answer here...'
+                      className='w-full px-4 py-3 rounded-lg bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1 font-code'
+                      value={userAnswers[currentQuestionIndex] || ''}
+                      onChange={handleTextAnswerChange}
+                      onKeyPress={(event) => { if (event.key === 'Enter') handleNextQuestion(); }}
+                      disabled={isLoading} // Disable input while analyzing
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -144,8 +281,9 @@ const AIChat = () => {
             {/* Navigation Button */}
             <div className='w-full text-center mt-6'>
               <button 
-                onClick={handleNextQuestion} 
-                disabled={isLoading || currentInput.trim() === ''}
+                onClick={handleNextQuestion}
+                // Disable if loading or if the current answer is not set for non-text questions
+                disabled={isLoading || userAnswers[currentQuestionIndex] === null} // Simplified disabled condition
                 className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors disabled:opacity-50 font-code'
               >
                 {currentQuestionIndex < stressQuestions.length - 1 ? 'Next Question' : 'Get Assessment'}
@@ -155,7 +293,7 @@ const AIChat = () => {
           </div>
         ) : (
           // Assessment Complete - Display Results
-          <div className='flex-1 overflow-y-auto py-8 px-10'>
+          <div className='flex-1 overflow-y-auto py-8 px-10 flex flex-col items-center'> {/* Added items-center for centering */}
             {isLoading ? (
               <div className='text-center text-n-1 font-code'>Analyzing your responses...</div>
             ) : error ? (
@@ -175,14 +313,8 @@ const AIChat = () => {
                 </div>
                 {/* Optional: Add a button to restart the assessment */}
                 <div className='w-full text-center mt-6'>
-                    <button 
-                        onClick={() => { 
-                            setCurrentQuestionIndex(0);
-                            setUserAnswers(Array(stressQuestions.length).fill(''));
-                            setCurrentInput('');
-                            setAssessmentComplete(false);
-                            setStressAssessmentResult(null);
-                        }}
+                    <button
+                        onClick={restartAssessment}
                         className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors font-code'
                     >
                         Restart Assessment
