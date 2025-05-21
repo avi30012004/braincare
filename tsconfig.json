@@ -22,10 +22,10 @@
     /* Path Aliases (optional, but good practice) */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@aiLib/*": ["./api/ai/lib/*"]
     },
-    "types": ["node"] // Add Vercel Node types here
+    "types": ["node"]
   },
-  "include": ["src", "api", "vite.config.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }] // If you have a tsconfig.node.json for Vite's main process
+  "include": ["src", "api", "vite.config.ts"]
 }

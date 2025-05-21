@@ -157,7 +157,6 @@ const AIChat = () => {
       // handleTextAnswerChange({ target: { value: userAnswers[currentQuestionIndex + 1] || '' } }); // Re-apply text answer if exists
     } else {
       // Last question answered, trigger assessment and mark assessment as complete
-      setAssessmentComplete(true);
       analyzeStress(updatedAnswers);
     }
   };
