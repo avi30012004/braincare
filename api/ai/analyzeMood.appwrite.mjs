@@ -131,7 +131,20 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
       }
     );
 
-    context.res.json({ message: 'Assessment saved successfully.', data: savedDoc }, 200);
+    context.res.json(
+      {
+        stressAssessment: {
+          result: {
+            stressLevel,
+            summary,
+            recommendations,
+ academicClassSchedules,
+          },
+        },
+ message: 'Assessment saved successfully.',
+      },
+      200
+    );
   } catch (err) {
     console.error('Appwrite save error:', err);
     context.res.json({ error: 'Failed to save data to Appwrite.' }, 500);
