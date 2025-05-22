@@ -200,10 +200,13 @@ const AIChat = () => {
 
       const data = await response.json();
 
+      console.log('Received data:', data);
       if (!response.ok) {
-        throw new Error(data.error || data.message || 'Failed to fetch stress assessment');
+        setError(data.error || data.message || 'Failed to fetch stress assessment');
+        console.error("Error analyzing stress:", data.error || data.message || 'Failed to fetch stress assessment');
+        return; // Stop execution if the response is not OK
       }
-
+      
       setStressAssessmentResult(data.stressAssessment.result);
     } catch (err) {
       console.error("Error analyzing stress:", err);

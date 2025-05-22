@@ -84,6 +84,7 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
   }
 
   const geminiData = await geminiResponse.json();
+  console.log('Gemini API response data:', geminiData);
   const aiResponseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!aiResponseText || typeof aiResponseText !== 'string') {
