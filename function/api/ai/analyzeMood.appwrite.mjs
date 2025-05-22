@@ -29,15 +29,15 @@ export default async function main(context) {
     return;
   }
 
-  const {
-    GEMINI_API_KEY,
-    VITE_APPWRITE_ENDPOINT,
-    VITE_APPWRITE_PROJECT_ID,
-    APPWRITE_API_KEY,
-    APPWRITE_DATABASE_ID,
-    STRESS_ASSESSMENT_COLLECTION_ID,
-  } = context.env;
+  // ✅ Use process.env for all config
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const VITE_APPWRITE_ENDPOINT = process.env.VITE_APPWRITE_ENDPOINT;
+  const VITE_APPWRITE_PROJECT_ID = process.env.VITE_APPWRITE_PROJECT_ID;
+  const APPWRITE_API_KEY = process.env.APPWRITE_API_KEY;
+  const APPWRITE_DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
+  const STRESS_ASSESSMENT_COLLECTION_ID = process.env.STRESS_ASSESSMENT_COLLECTION_ID;
 
+  // ✅ Validate env variables
   if (
     !GEMINI_API_KEY ||
     !VITE_APPWRITE_ENDPOINT ||
@@ -46,7 +46,7 @@ export default async function main(context) {
     !APPWRITE_DATABASE_ID ||
     !STRESS_ASSESSMENT_COLLECTION_ID
   ) {
-    context.res.json({ error: 'Missing environment variables.' }, 500);
+    context.res.json({ error: 'Missing one or more required environment variables.' }, 500);
     return;
   }
 
@@ -141,10 +141,10 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
             stressLevel,
             summary,
             recommendations,
- academicClassSchedules,
+            academicClassSchedules,
           },
         },
- message: 'Assessment saved successfully.',
+        message: 'Assessment saved successfully.',
       },
       200
     );
