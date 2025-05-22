@@ -1,14 +1,14 @@
 import { Client, Databases, ID } from 'node-appwrite';
 
 export default async function main(context) {
-  console.log('Full context object:', context);
+  console.log('Incoming request context:', context);
 
-  // ─────────────────────── Guard: HTTP method ───────────────────────
+  // ─── Enforce POST Method ────────────────────────────────
   if (context.req.method !== 'POST') {
-    return context.res.json({ message: 'Only POST requests are allowed' }, 405);
+    return context.res.json({ message: 'Only POST requests are allowed.' }, 405);
   }
 
-  // ─────────────────────── Parse & Validate Request ───────────────────────
+  // ─── Parse & Validate Incoming Payload ───────────────────
   let payload;
   try {
     payload = JSON.parse(context.req.bodyRaw);
@@ -18,39 +18,32 @@ export default async function main(context) {
 
   const { testAnswers, clerkUserId } = payload;
 
-  if (
-    !testAnswers || !Array.isArray(testAnswers) || 
-    !testAnswers.every(a => typeof a === 'string')
-  ) {
-    return context.res.json(
-      { error: "Missing or invalid 'testAnswers' (array of strings) in request body." }, 400
-    );
+  if (!Array.isArray(testAnswers) || !testAnswers.every(a => typeof a === 'string')) {
+    return context.res.json({ error: "'testAnswers' must be an array of strings." }, 400);
   }
 
   if (!clerkUserId || typeof clerkUserId !== 'string') {
-    return context.res.json({ error: "Missing or invalid 'clerkUserId'." }, 400);
+    return context.res.json({ error: "'clerkUserId' is required and must be a string." }, 400);
   }
 
-  // ─────────────────────── Validate Environment Vars ───────────────────────
+  // ─── Validate Env Vars ──────────────────────────────────
   const {
     GEMINI_API_KEY,
     VITE_APPWRITE_ENDPOINT,
     VITE_APPWRITE_PROJECT_ID,
     APPWRITE_API_KEY,
     APPWRITE_DATABASE_ID,
-    STRESS_ASSESSMENT_COLLECTION_ID
+    STRESS_ASSESSMENT_COLLECTION_ID,
   } = process.env;
 
   if (
     !GEMINI_API_KEY || !VITE_APPWRITE_ENDPOINT || !VITE_APPWRITE_PROJECT_ID ||
     !APPWRITE_API_KEY || !APPWRITE_DATABASE_ID || !STRESS_ASSESSMENT_COLLECTION_ID
   ) {
-    return context.res.json({ error: 'Missing one or more required environment variables.' }, 500);
+    return context.res.json({ error: 'Missing environment variables.' }, 500);
   }
 
-  // ─────────────────────── Gemini Prompt ───────────────────────
-  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
+  // ─── Prepare Gemini Prompt ──────────────────────────────
   const prompt = `As an AI assistant specializing in mental well-being, please analyze the \
 following answers from a stress assessment questionnaire. Based on these responses, determine \
 the user's current stress level.
@@ -60,14 +53,16 @@ ${JSON.stringify(testAnswers)}
 
 Provide your assessment strictly as a JSON object with the following keys:
 - "stressLevel": A categorical stress level (e.g., "Low", "Moderate", "High", "Critical").
-- "summary": A detailed summary of the stress level, explaining the basis for the stress level assessment.
-- "recommendations": An array of 2-3 brief, actionable recommendations tailored to the assessed stress level.
+- "summary": A detailed summary of the stress level.
+- "recommendations": An array of 2-3 brief, actionable recommendations.
 - "academic class schedules": an academic class schedule for this student.
 
-Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
+Do NOT include markdown, comments, or extra text. Return only valid JSON.`
 
-  // ─────────────────────── Gemini Request with Retry ───────────────────────
-  let geminiData;
+  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  // ─── Call Gemini API ────────────────────────────────────
+  let aiRawText;
   try {
     const res = await fetch(GEMINI_API_URL, {
       method: 'POST',
@@ -76,27 +71,28 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      return context.res.json({ error: 'Gemini API error.', details: errorText }, res.status);
+      const errText = await res.text();
+      return context.res.json({ error: 'Gemini API error.', details: errText }, res.status);
     }
 
-    geminiData = await res.json();
+    const data = await res.json();
+    aiRawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!aiRawText) {
+      console.error('Gemini unexpected format:', JSON.stringify(data, null, 2));
+      return context.res.json({ error: 'Unexpected Gemini response format.' }, 500);
+    }
   } catch (err) {
-    return context.res.json({ error: 'Failed to connect to Gemini API.', details: err.message }, 500);
+    return context.res.json({ error: 'Failed to reach Gemini API.', details: err.message }, 500);
   }
 
-  // ─────────────────────── Parse Gemini JSON Output ───────────────────────
-  const aiResponseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (!aiResponseText || typeof aiResponseText !== 'string') {
-    console.error('Unexpected Gemini format:', geminiData);
-    return context.res.json({ error: 'Invalid AI response format.' }, 500);
-  }
-
+  // ─── Clean + Parse Gemini Output ────────────────────────
+  const cleanedText = aiRawText.trim().replace(/^```json|```$/g, '').trim();
   let parsed;
   try {
-    parsed = JSON.parse(aiResponseText);
-  } catch {
+    parsed = JSON.parse(cleanedText);
+  } catch (err) {
+    console.error('Failed to parse AI response:', cleanedText);
     return context.res.json({ error: 'AI response is not valid JSON.' }, 500);
   }
 
@@ -113,10 +109,10 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
     !Array.isArray(recommendations) ||
     typeof academicClassSchedules !== 'string'
   ) {
-    return context.res.json({ error: 'AI response contains invalid or missing fields.' }, 500);
+    return context.res.json({ error: 'Invalid AI response structure.' }, 500);
   }
 
-  // ─────────────────────── Save to Appwrite DB ───────────────────────
+  // ─── Save to Appwrite Database ──────────────────────────
   const client = new Client()
     .setEndpoint(VITE_APPWRITE_ENDPOINT)
     .setProject(VITE_APPWRITE_PROJECT_ID)
@@ -125,7 +121,7 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
   const databases = new Databases(client);
 
   try {
-    await databases.createDocument(
+    const doc = await databases.createDocument(
       APPWRITE_DATABASE_ID,
       STRESS_ASSESSMENT_COLLECTION_ID,
       ID.unique(),
@@ -141,16 +137,16 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
 
     return context.res.json({
       success: true,
+      message: 'Assessment saved successfully.',
       data: {
         stressLevel,
         summary,
         recommendations,
         academicClassSchedules
-      },
-      message: 'Assessment saved successfully.'
+      }
     }, 200);
   } catch (err) {
-    console.error('Appwrite save error:', err);
-    return context.res.json({ error: 'Failed to save data to Appwrite.' }, 500);
+    console.error('Appwrite DB write failed:', err);
+    return context.res.json({ error: 'Failed to save assessment to database.' }, 500);
   }
 }
