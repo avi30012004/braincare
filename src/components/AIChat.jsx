@@ -189,7 +189,7 @@ const AIChat = () => {
       // Ensure you have your Appwrite Project ID available on the frontend.
       // It's often stored in your .env file (e.g., VITE_APPWRITE_PROJECT_ID)
       const appwriteProjectId = import.meta.env.VITE_APPWRITE_PROJECT_ID; // Assuming Vite for environment variables
-      const response = await fetch('https://fra.cloud.appwrite.io/v1/functions/682e28970019c300b6de/executions', {
+      const response = await fetch('https://fra.cloud.appwrite.io/v1/functions/682e9f1a0010fa4f9d55/executions', {
         method: 'POST',
  headers: {
           'Content-Type': 'application/json',
