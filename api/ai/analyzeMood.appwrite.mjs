@@ -1,6 +1,6 @@
 import { Client, Databases, ID } from 'node-appwrite';
 
-export default async function main(context: any) {
+export default async function main(context) {
   if (context.req.method !== 'POST') {
     context.res.json({ message: 'Only POST requests are allowed' }, 405);
     return;
@@ -27,7 +27,6 @@ export default async function main(context: any) {
     return;
   }
 
-  // Validate environment variables
   const {
     GEMINI_API_KEY,
     VITE_APPWRITE_ENDPOINT,
@@ -64,15 +63,19 @@ Provide your assessment strictly as a JSON object with the following keys:
 
 Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
 
-
-  // Call Gemini API
-  const geminiResponse = await fetch(GEMINI_API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-    }),
-  });
+  let geminiResponse;
+  try {
+    geminiResponse = await fetch(GEMINI_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
+    });
+  } catch (error) {
+    context.res.json({ error: 'Failed to connect to Gemini API.', details: error.message }, 500);
+    return;
+  }
 
   if (!geminiResponse.ok) {
     const errorBody = await geminiResponse.text();
@@ -81,14 +84,13 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
   }
 
   const geminiData = await geminiResponse.json();
-  let aiResponseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+  const aiResponseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!aiResponseText || typeof aiResponseText !== 'string') {
     context.res.json({ error: 'Invalid AI response format.' }, 500);
     return;
   }
 
-  // Try parsing Gemini's AI response
   let parsed;
   try {
     parsed = JSON.parse(aiResponseText);
@@ -97,14 +99,16 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
     return;
   }
 
-  const { stressLevel, summary, recommendations, ['academic class schedules']: academicClassSchedules } = parsed;
+  const stressLevel = parsed.stressLevel;
+  const summary = parsed.summary;
+  const recommendations = parsed.recommendations;
+  const academicClassSchedules = parsed['academic class schedules'];
 
   if (!stressLevel || !summary || !recommendations || !academicClassSchedules) {
     context.res.json({ error: 'AI response missing required fields.' }, 500);
     return;
   }
 
-  // Appwrite Client Setup
   const client = new Client()
     .setEndpoint(VITE_APPWRITE_ENDPOINT)
     .setProject(VITE_APPWRITE_PROJECT_ID)
@@ -112,7 +116,6 @@ Do NOT include any markdown, comments, or extra text. Only return valid JSON.`;
 
   const databases = new Databases(client);
 
-  // Save to Appwrite
   try {
     const savedDoc = await databases.createDocument(
       APPWRITE_DATABASE_ID,
