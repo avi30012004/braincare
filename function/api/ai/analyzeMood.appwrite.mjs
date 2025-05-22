@@ -1,6 +1,8 @@
 import { Client, Databases, ID } from 'node-appwrite';
 
 export default async function main(context) {
+  console.log('Full context object:', context);
+
   if (context.req.method !== 'POST') {
     context.res.json({ message: 'Only POST requests are allowed' }, 405);
     return;
