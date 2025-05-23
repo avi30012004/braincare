@@ -14,6 +14,9 @@ export default async ({ req, res }) => {
     }
 
     console.log("➡️ Received raw request body:", req.body);
+    // Log character codes to help identify invisible characters
+    console.log("➡️ Raw body character codes:", [...(req.body || '')].map(c => c.charCodeAt(0)));
+
 
     let body = {};
     if (typeof req.body !== 'string' || req.body.trim() === '') {
@@ -21,7 +24,9 @@ export default async ({ req, res }) => {
       return res.send("Invalid request body", 400);
     }
     try {
-      body = JSON.parse(req.body);
+      // Remove common invisible Unicode characters before parsing
+      const cleanedBody = req.body.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+      body = JSON.parse(cleanedBody);
     } catch (parseError) {
       console.error("❌ Error parsing request body JSON:", parseError.message || parseError);
       return res.send("Invalid JSON in request body", 400);
