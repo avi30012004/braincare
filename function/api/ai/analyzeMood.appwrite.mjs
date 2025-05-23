@@ -13,7 +13,19 @@ export default async ({ req, res }) => {
       return res.send("Missing API key", 500);
     }
 
-    const body = JSON.parse(req.body || "{}");
+    console.log("➡️ Received raw request body:", req.body);
+
+    let body = {};
+    if (typeof req.body !== 'string' || req.body.trim() === '') {
+      console.error("❌ Invalid or empty request body received.");
+      return res.send("Invalid request body", 400);
+    }
+    try {
+      body = JSON.parse(req.body);
+    } catch (parseError) {
+      console.error("❌ Error parsing request body JSON:", parseError.message || parseError);
+      return res.send("Invalid JSON in request body", 400);
+    }
     const answers = Array.isArray(body.answers) ? body.answers : [];
     if (answers.length === 0) {
       console.error("❌ Invalid or empty 'answers' received.");
