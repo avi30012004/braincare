@@ -6,6 +6,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
+      console.log('Raw request body:', req.body);
+      console.log('Parsed request body:', req.body);
       const requestBody = req.body;
       console.log('Received request body:', requestBody);
 
@@ -20,7 +22,7 @@ export default async function handler(req, res) {
       const databases = new Databases(client);
 
       // 2. Extract the stress test answers from the request body
-      const answers = requestBody.answers; // Assuming the answers are in a field called 'answers'
+      const answers = req.body.testAnswers; // Assuming the answers are in a field called 'testAnswers' as sent from the frontend
 
       if (!answers || !Array.isArray(answers)) {
         console.error('Invalid or missing answers in request body.');
