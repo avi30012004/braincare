@@ -168,10 +168,16 @@ const AIChat = () => {
     setIsLoading(true);
     setError(null);
     
+    const assessmentData = stressQuestions.map((question, index) => ({
+      question: question.question,
+      answer: answers[index]
+    }));
+
     try {
-      console.log('Making request to Vercel function...');
-      console.log('Answers:', answers);
-      
+      console.log('Making request to Vercel function with assessment data...');
+      console.log('Assessment Data:', assessmentData);
+
+
       const response = await fetch('/api/analyzeStress', {
         method: 'POST',
         headers: {
@@ -179,6 +185,7 @@ const AIChat = () => {
         },
         body: JSON.stringify({ 
           testAnswers: answers,
+ assessmentData: assessmentData,
         }),
       });
       console.log('Response status:', response.status);
@@ -186,18 +193,22 @@ const AIChat = () => {
       
       const data = await response.json();
       console.log('Full API Response:', data);
-
-      // Check if this is an Appwrite execution response
+      
       if (data.success && data.stressAssessment && data.stressAssessment.result) {
-        console.log('Direct function response detected');
         setStressAssessmentResult(data.stressAssessment.result);
- return;
-      } 
-      else {
+      } else {
+           level === 'High' ? '75%' :
+           level === 'Critical' ? '100%' : '0%';
+  };
+
+  const stressLevelToColor = (level) => {
+    return level === 'Low' ? 'bg-green-500' :
+           level === 'Moderate' ? 'bg-yellow-500' :
+           level === 'High' ? 'bg-orange-500' :
         console.error('Unexpected response structure:', data);
         throw new Error('Invalid response structure from function');
       }
-      
+
     } catch (err) {
       console.error('Error analyzing stress:', err);
       setError(`Error: ${err.message}`);
@@ -216,9 +227,6 @@ const AIChat = () => {
   };
 
   const stressLevelToColor = (level) => {
-    return level === 'Low' ? 'bg-green-500' :
-           level === 'Moderate' ? 'bg-yellow-500' :
-           level === 'High' ? 'bg-orange-500' :
            level === 'Critical' ? 'bg-red-500' : 'bg-gray-500';
   };
 
