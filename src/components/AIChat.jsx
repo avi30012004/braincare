@@ -185,7 +185,8 @@ const AIChat = () => {
         },
         body: JSON.stringify({ 
           testAnswers: answers,
- assessmentData: assessmentData,
+          assessmentData: assessmentData,
+          clerkUserId: 'test_user_' + Date.now()
         }),
       });
       console.log('Response status:', response.status);
@@ -245,10 +246,12 @@ const AIChat = () => {
             <div className='bg-gray-50 p-6 rounded-lg mb-6'>
               <h3 className='text-xl font-semibold mb-3'>Stress Level: {stressAssessmentResult.stressLevel}</h3>
               <div className='w-full bg-gray-200 h-6 rounded-full mb-4'>
-                <div
-                  className={`h-6 rounded-full transition-all duration-500 ${stressLevelToColor(stressAssessmentResult.stressLevel)}`}
-                  style={{ width: stressLevelToPercentage(stressAssessmentResult.stressLevel) }}
-                ></div>
+                {stressAssessmentResult.stressLevel && (
+ <div
+ className={`h-6 rounded-full transition-all duration-500 ${stressLevelToColor(stressAssessmentResult.stressLevel)}`}
+ style={{ width: stressLevelToPercentage(stressAssessmentResult.stressLevel) }}
+ ></div>
+ )}
               </div>
             </div>
 
