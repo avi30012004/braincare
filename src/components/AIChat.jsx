@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Define your stress assessment questions here
 const stressQuestions = [
   {
     category: "School",
@@ -133,216 +132,248 @@ const stressQuestions = [
 
 const AIChat = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState(Array(stressQuestions.length).fill(null)); // Changed initial value to null
+  const [userAnswers, setUserAnswers] = useState(Array(stressQuestions.length).fill(null));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [stressAssessmentResult, setStressAssessmentResult] = useState(null);
 
-  const handleInputChange = (event) => {
-    setCurrentInput(event.target.value);
-  }; // This input is not used for multiple choice
-
-  const handleOptionSelect = (optionValue) => {
+  const handleOptionSelect = (value) => {
     const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQuestionIndex] = optionValue;
+    updatedAnswers[currentQuestionIndex] = value;
     setUserAnswers(updatedAnswers);
   };
 
-  const handleNextQuestion = () => {
-    const updatedAnswers = [...userAnswers]; // Declare updatedAnswers here
-    // setCurrentInput(''); // This is for text input, not needed for multiple choice
+  const handleTextAnswerChange = (e) => {
+    const updatedAnswers = [...userAnswers];
+    updatedAnswers[currentQuestionIndex] = e.target.value;
+    setUserAnswers(updatedAnswers);
+  };
+
+  const handleNext = () => {
     if (currentQuestionIndex < stressQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      // Optionally, pre-fill input if user already answered this question in a previous session
-      // handleTextAnswerChange({ target: { value: userAnswers[currentQuestionIndex + 1] || '' } }); // Re-apply text answer if exists
     } else {
-      // Last question answered, trigger assessment and mark assessment as complete
-      analyzeStress(updatedAnswers);
+      analyzeStress(userAnswers);
     }
   };
 
-  // Handle text input questions
-  const handleTextAnswerChange = (event) => {
-      const updatedAnswers = [...userAnswers];
-      updatedAnswers[currentQuestionIndex] = event.target.value;
-      setUserAnswers(updatedAnswers);
-  };
-
-  const currentQuestion = stressQuestions[currentQuestionIndex];
-  const assessmentComplete = currentQuestionIndex === stressQuestions.length; // Determine assessment completion based on index
-
   const restartAssessment = () => {
     setCurrentQuestionIndex(0);
-    setUserAnswers(Array(stressQuestions.length).fill(null)); // Reset to null
-    setCurrentInput(''); // This might not be needed anymore if not using text input
+    setUserAnswers(Array(stressQuestions.length).fill(null));
     setStressAssessmentResult(null);
-    setError(null); // Also clear any previous errors on restart
+    setError(null);
   };
 
   const analyzeStress = async (answers) => {
     setIsLoading(true);
     setError(null);
-    setStressAssessmentResult(null);
-
+    
     try {
-      // Use the Appwrite Functions HTTP endpoint
-      // Ensure you have your Appwrite Project ID available on the frontend.
-      // It's often stored in your .env file (e.g., VITE_APPWRITE_PROJECT_ID)
-      const appwriteProjectId = import.meta.env.VITE_APPWRITE_PROJECT_ID; // Assuming Vite for environment variables
+      const appwriteProjectId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
+      console.log('Making request to Appwrite function...');
+      console.log('Project ID:', appwriteProjectId);
+      console.log('Answers:', answers);
+      
       const response = await fetch('https://fra.cloud.appwrite.io/v1/functions/682e9f1a0010fa4f9d55/executions', {
         method: 'POST',
- headers: {
+        headers: {
           'Content-Type': 'application/json',
- 'X-Appwrite-Project': appwriteProjectId,
- },
-        body: JSON.stringify({ testAnswers: answers }),
+          'X-Appwrite-Project': appwriteProjectId,
+        },
+        body: JSON.stringify({ 
+          testAnswers: answers,
+          clerkUserId: 'test_user_' + Date.now()
+        })
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers));
+      
       const data = await response.json();
+      console.log('Full API Response:', data);
 
-      console.log('Received data:', data);
-      if (!response.ok) {
-        setError(data.error || data.message || 'Failed to fetch stress assessment');
-        console.error("Error analyzing stress:", data.error || data.message || 'Failed to fetch stress assessment');
-        return; // Stop execution if the response is not OK
+      // Check if this is an Appwrite execution response
+      if (data.$id && data.responseStatusCode !== undefined) {
+        console.log('Appwrite execution response detected');
+        console.log('Status code:', data.responseStatusCode);
+        console.log('Response body:', data.responseBody);
+        console.log('Errors:', data.errors);
+        console.log('Logs:', data.logs);
+        
+        if (data.responseStatusCode !== 200) {
+          throw new Error(`Function failed with status ${data.responseStatusCode}. Errors: ${data.errors || 'None'}. Logs: ${data.logs || 'None'}`);
+        }
+        
+        if (!data.responseBody) {
+          throw new Error('Function returned empty response body');
+        }
+        
+        // Parse the actual function response
+        try {
+          const functionResult = JSON.parse(data.responseBody);
+          console.log('Parsed function result:', functionResult);
+          
+          if (functionResult.success && functionResult.stressAssessment && functionResult.stressAssessment.result) {
+            setStressAssessmentResult(functionResult.stressAssessment.result);
+            return;
+          } else {
+            throw new Error('Invalid function response structure');
+          }
+        } catch (parseError) {
+          console.error('Failed to parse function response body:', parseError);
+          throw new Error(`Failed to parse function response: ${parseError.message}`);
+        }
+      } 
+      // Direct function response (not wrapped in execution)
+      else if (data.success && data.stressAssessment && data.stressAssessment.result) {
+        console.log('Direct function response detected');
+        setStressAssessmentResult(data.stressAssessment.result);
+      } 
+      else {
+        console.error('Unexpected response structure:', data);
+        throw new Error('Invalid response structure from function');
       }
       
-      setStressAssessmentResult(data.stressAssessment.result);
     } catch (err) {
-      console.error("Error analyzing stress:", err);
-      setError(err.message);
+      console.error('Error analyzing stress:', err);
+      setError(`Error: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Calculate stress meter percentage (using a simple mapping for demo)
-  const stressLevelToPercentage = stressAssessmentResult ? 
-    (stressAssessmentResult.stressLevel === 'Low' ? '25%' :
-     stressAssessmentResult.stressLevel === 'Moderate' ? '50%' :
-     stressAssessmentResult.stressLevel === 'High' ? '75%' :
-     stressAssessmentResult.stressLevel === 'Critical' ? '100%' : '0%')
-    : '0%';
+  const currentQuestion = stressQuestions[currentQuestionIndex];
+
+  const stressLevelToPercentage = (level) => {
+    return level === 'Low' ? '25%' :
+           level === 'Moderate' ? '50%' :
+           level === 'High' ? '75%' :
+           level === 'Critical' ? '100%' : '0%';
+  };
+
+  const stressLevelToColor = (level) => {
+    return level === 'Low' ? 'bg-green-500' :
+           level === 'Moderate' ? 'bg-yellow-500' :
+           level === 'High' ? 'bg-orange-500' :
+           level === 'Critical' ? 'bg-red-500' : 'bg-gray-500';
+  };
 
   return (
-    <div className='min-h-screen bg-n-8 flex flex-col items-center px-5 lg:px-10 py-10'>
-      <div className='w-full max-w-7xl flex flex-col'>
-        {/* Chat Header */}
-        <div className='w-full px-10 py-8 border-b border-n-6'>
-          <h1 className='text-4xl lg:text-5xl font-bold text-n-1 font-code'>Healbot Stress Assessment</h1>
-          <p className='text-n-1/50'>Answer the questions below to get a stress assessment.</p>
-        </div>
-
-        {/* Stress Meter Placeholder */}
-        <div className='w-full bg-n-7 h-2 rounded-full mt-4 mb-8'>
-          <div 
-            className='bg-color-1 h-full rounded-full transition-all duration-500 ease-in-out' 
-            style={{ width: stressLevelToPercentage }}
-          ></div>
-        </div>
-
-        {currentQuestionIndex < stressQuestions.length ? ( // Render questions if assessment not complete
-          <div className='flex-1 overflow-y-auto py-8 px-10'>
-            <div className='mb-4'>
-              {/* Bot Message (Question) */}
-              <div className='flex justify-start items-start mb-6'>
-                <div className='bg-n-6 rounded-xl p-3 text-n-1 max-w-[80%]'>
-                  <p className='text-xs text-n-1/50'>Healbot</p>
-                  <p className='font-code'>{currentQuestion.question}</p>
-                </div>
-              </div>
-
-              {/* User Options or Text Input */}
-              <div className='flex flex-col items-end'>
-                <div className='w-full max-w-[80%]'>
-                  {currentQuestion.options.length > 0 ? (
-                    // Multiple choice options
-                    <div className='flex flex-col space-y-3'>
-                      {currentQuestion.options.map((option, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleOptionSelect(option.value)}
-                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-code ${userAnswers[currentQuestionIndex] === option.value ? 'bg-color-1 text-n-1' : 'bg-n-9 text-n-1/75 hover:bg-n-7'}`}
-                          disabled={isLoading}
-                        >
-                          {option.text}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    // Text input for open-ended questions
-                    <input
-                      type='text'
-                      placeholder='Type your answer here...'
-                      className='w-full px-4 py-3 rounded-lg bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1 font-code'
-                      value={userAnswers[currentQuestionIndex] || ''}
-                      onChange={handleTextAnswerChange}
-                      onKeyPress={(event) => { if (event.key === 'Enter') handleNextQuestion(); }}
-                      disabled={isLoading} // Disable input while analyzing
-                    />
-                  )}
-                </div>
+    <div className='min-h-screen bg-gray-100 flex flex-col items-center px-5 py-10'>
+      <div className='w-full max-w-4xl bg-white rounded-lg shadow-lg p-6'>
+        {isLoading ? (
+          <div className='text-center'>
+            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4'></div>
+            <p className='text-lg'>Analyzing your answers...</p>
+          </div>
+        ) : stressAssessmentResult ? (
+          <div>
+            <h2 className='text-3xl font-bold mb-6 text-center'>Assessment Result</h2>
+            
+            <div className='bg-gray-50 p-6 rounded-lg mb-6'>
+              <h3 className='text-xl font-semibold mb-3'>Stress Level: {stressAssessmentResult.stressLevel}</h3>
+              <div className='w-full bg-gray-200 h-6 rounded-full mb-4'>
+                <div
+                  className={`h-6 rounded-full transition-all duration-500 ${stressLevelToColor(stressAssessmentResult.stressLevel)}`}
+                  style={{ width: stressLevelToPercentage(stressAssessmentResult.stressLevel) }}
+                ></div>
               </div>
             </div>
 
-            {/* Navigation Button */}
-            <div className='w-full text-center mt-6'>
-              <button 
-                onClick={handleNextQuestion}
-                // Disable if loading or if the current answer is not set for non-text questions
-                disabled={isLoading || userAnswers[currentQuestionIndex] === null} // Simplified disabled condition
-                className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors disabled:opacity-50 font-code'
-              >
-                {currentQuestionIndex < stressQuestions.length - 1 ? 'Next Question' : 'Get Assessment'}
-              </button>
-            </div>
+            {stressAssessmentResult.summary && (
+              <div className='mb-6'>
+                <h3 className='text-xl font-semibold mb-3'>Summary</h3>
+                <p className='text-gray-700 leading-relaxed'>{stressAssessmentResult.summary}</p>
+              </div>
+            )}
 
+            {stressAssessmentResult.recommendations && stressAssessmentResult.recommendations.length > 0 && (
+              <div className='mb-6'>
+                <h3 className='text-xl font-semibold mb-3'>Recommendations</h3>
+                <ul className='space-y-2'>
+                  {stressAssessmentResult.recommendations.map((rec, index) => (
+                    <li key={index} className='flex items-start'>
+                      <span className='text-blue-500 mr-2'>•</span>
+                      <span className='text-gray-700'>{rec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {stressAssessmentResult.academicClassSchedules && (
+              <div className='mb-6'>
+                <h3 className='text-xl font-semibold mb-3'>Suggested Academic Schedule</h3>
+                <p className='text-gray-700 leading-relaxed'>{stressAssessmentResult.academicClassSchedules}</p>
+              </div>
+            )}
+
+            <button 
+              onClick={restartAssessment} 
+              className='w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors'
+            >
+              Take Assessment Again
+            </button>
           </div>
         ) : (
-          // Assessment Complete - Display Results
-          <div className='flex-1 overflow-y-auto py-8 px-10 flex flex-col items-center'> {/* Added items-center for centering */}
-            {isLoading ? (
-              <div className='text-center text-n-1 font-code'>Analyzing your responses...</div>
-            ) : error ? (
-              <div className='text-center text-red-500 font-code'>Error: {error}</div>
-            ) : stressAssessmentResult && (
-              <div className='w-full px-10 py-8 mt-4 bg-n-7 rounded-lg text-n-1'>
-                <h2 className='text-2xl font-bold mb-4 font-code'>Your Stress Assessment:</h2>
-                <p className='mb-2'><strong className='font-semibold'>Stress Level:</strong> {stressAssessmentResult.stressLevel}</p>
-                <p className='mb-2'><strong className='font-semibold'>Summary:</strong> {stressAssessmentResult.summary}</p>
-                <div>
-                  <strong className='font-semibold'>Recommendations:</strong>
-                  <ul className='list-disc list-inside ml-4 mt-1'>
-                    {stressAssessmentResult.recommendations && stressAssessmentResult.recommendations.map((rec, index) => (
-                      <li key={index}>{rec}</li>
-                    ))}
-                  </ul>
-                </div>
-                {/* Optional: Add a button to restart the assessment */}
-                <div className='w-full text-center mt-6'>
-                    <button
-                        onClick={restartAssessment}
-                        className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors font-code'
-                    >
-                        Restart Assessment
-                    </button>
-                </div>
+          <div>
+            <div className='mb-4'>
+              <div className='flex justify-between items-center mb-2'>
+                <h2 className='text-xl font-semibold'>Question {currentQuestionIndex + 1} of {stressQuestions.length}</h2>
+                <div className='text-sm text-gray-500'>{currentQuestion.category}</div>
+              </div>
+              <div className='w-full bg-gray-200 h-2 rounded-full'>
+                <div 
+                  className='bg-blue-500 h-2 rounded-full transition-all duration-300'
+                  style={{ width: `${((currentQuestionIndex + 1) / stressQuestions.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <p className='text-lg mb-6'>{currentQuestion.question}</p>
+            
+            {currentQuestion.options.length > 0 ? (
+              <div className='space-y-3'>
+                {currentQuestion.options.map((opt, idx) => (
+                  <button
+                    key={idx}
+                    className={`block w-full text-left p-4 border-2 rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 ${
+                      userAnswers[currentQuestionIndex] === opt.value 
+                        ? 'border-blue-500 bg-blue-100' 
+                        : 'border-gray-200'
+                    }`}
+                    onClick={() => handleOptionSelect(opt.value)}
+                  >
+                    {opt.text}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <textarea
+                className='w-full border-2 border-gray-200 p-4 rounded-lg focus:border-blue-500 focus:outline-none resize-none'
+                rows={4}
+                placeholder='Type your answer here...'
+                value={userAnswers[currentQuestionIndex] || ''}
+                onChange={handleTextAnswerChange}
+              />
+            )}
+            
+            <button 
+              onClick={handleNext} 
+              disabled={!userAnswers[currentQuestionIndex]}
+              className='w-full mt-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors'
+            >
+              {currentQuestionIndex === stressQuestions.length - 1 ? 'Complete Assessment' : 'Next Question'}
+            </button>
+            
+            {error && (
+              <div className='mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg'>
+                <p className='font-semibold'>Error:</p>
+                <p>{error}</p>
               </div>
             )}
           </div>
         )}
-
-        {/* Optional: Keep the general chat input if you want a hybrid mode later */}
-        {/* 
-        <div className='p-6 border-t border-n-6'>
-          <div className='flex items-center space-x-4'>
-            <input type='text' placeholder='Share your thoughts...' className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1' />
-            <button className='px-4 py-2 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors'>
-              <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 19l9 2-9-18-9 18 9-2zm0 0v-8' /></svg>
-            </button>
-          </div>
-        </div>
-        */}
       </div>
     </div>
   );
