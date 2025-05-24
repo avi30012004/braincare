@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       }
 
       // 3. Call the Gemini API with the answers
-      console.log('Calling Gemini API with answers:', answers);
+      console.log('Calling Gemini API with assessment data:', assessmentData);
 
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
