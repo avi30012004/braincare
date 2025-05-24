@@ -169,23 +169,18 @@ const AIChat = () => {
     setError(null);
     
     try {
-      const appwriteProjectId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
-      console.log('Making request to Appwrite function...');
-      console.log('Project ID:', appwriteProjectId);
+      console.log('Making request to Vercel function...');
       console.log('Answers:', answers);
       
-      const response = await fetch('https://fra.cloud.appwrite.io/v1/functions/682e9f1a0010fa4f9d55/executions', {
+      const response = await fetch('/api/analyzeStress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Appwrite-Project': appwriteProjectId,
         },
         body: JSON.stringify({ 
           testAnswers: answers,
-          clerkUserId: 'test_user_' + Date.now()
-        })
+        }),
       });
-
       console.log('Response status:', response.status);
       console.log('Response headers:', Object.fromEntries(response.headers));
       
@@ -193,41 +188,10 @@ const AIChat = () => {
       console.log('Full API Response:', data);
 
       // Check if this is an Appwrite execution response
-      if (data.$id && data.responseStatusCode !== undefined) {
-        console.log('Appwrite execution response detected');
-        console.log('Status code:', data.responseStatusCode);
-        console.log('Response body:', data.responseBody);
-        console.log('Errors:', data.errors);
-        console.log('Logs:', data.logs);
-        
-        if (data.responseStatusCode !== 200) {
-          throw new Error(`Function failed with status ${data.responseStatusCode}. Errors: ${data.errors || 'None'}. Logs: ${data.logs || 'None'}`);
-        }
-        
-        if (!data.responseBody) {
-          throw new Error('Function returned empty response body');
-        }
-        
-        // Parse the actual function response
-        try {
-          const functionResult = JSON.parse(data.responseBody);
-          console.log('Parsed function result:', functionResult);
-          
-          if (functionResult.success && functionResult.stressAssessment && functionResult.stressAssessment.result) {
-            setStressAssessmentResult(functionResult.stressAssessment.result);
-            return;
-          } else {
-            throw new Error('Invalid function response structure');
-          }
-        } catch (parseError) {
-          console.error('Failed to parse function response body:', parseError);
-          throw new Error(`Failed to parse function response: ${parseError.message}`);
-        }
-      } 
-      // Direct function response (not wrapped in execution)
-      else if (data.success && data.stressAssessment && data.stressAssessment.result) {
+      if (data.success && data.stressAssessment && data.stressAssessment.result) {
         console.log('Direct function response detected');
         setStressAssessmentResult(data.stressAssessment.result);
+ return;
       } 
       else {
         console.error('Unexpected response structure:', data);
