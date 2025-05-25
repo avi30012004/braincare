@@ -39,7 +39,9 @@ const AIChat = ({ onAssessmentComplete, stressAssessmentResult, isLoading, error
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       setAssessmentComplete(true);
-      onAssessmentComplete(updatedAnswers);
+      // Create a temporary array with the last answer included for the API call
+      const finalAnswers = [...updatedAnswers];
+      onAssessmentComplete(finalAnswers);
     }
   };
 
