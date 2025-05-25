@@ -2,21 +2,126 @@ import React, { useState } from 'react';
 
 // Define stress assessment questions
 const stressQuestions = [
-  "Pop quiz! Three exams and a massive paper land on your doorstep the same week. Do you: a) Embrace the chaos, b) Strategically plan your survival, c) Hide under the covers and hope it all goes away?",
-  "That essay you poured your heart and soul into gets a grade that resembles your bank account balance after spring break. Your reaction: a) Professor feedback is my fuel! b) Time to drown my sorrows in pizza (and maybe revise later), c) Question the meaning of life (and grading rubrics).",
-  "Lost in lecture? Decoding ancient hieroglyphics would be easier than understanding this class. You: a) Form a study group and conquer together, b) Hit up office hours and charm the professor, c) Accept your fate and hope for a curve.",
-  "Laptop meltdown! Right before a major deadline, your trusty tech companion decides to take an unscheduled vacation. You: a) Crowdfund a new one on campus, b) Become best friends with the library computers, c) Embrace the handwritten life (and pray for legible handwriting).",
-  "Part-time job offer: Extra cash or extra study time? That is the question. You: a) Master the art of time management and become a multitasking ninja, b) Sleep is for the weak (and the wealthy), c) Prioritize academics and hope for a scholarship miracle.",
-  "FOMO alert! Everyone's at that party and you're stuck at home with a textbook. You: a) No biggie, my Netflix queue is calling my name, b) Crash the party and make a grand entrance, c) Wallow in self-pity and stalk everyone's Instagram stories.",
-  "Roommate drama! Passive-aggressive sticky notes are now the primary form of communication. You: a) Call a roommate summit and establish house rules, b) Invest in noise-canceling headphones and a personal stash of snacks, c) Plot elaborate pranks involving glitter and rubber ducks.",
-  "Running on fumes and fueled by caffeine. You resemble a zombie more than a student. You: a) Schedule some me time and recharge, b) Embrace the chaos, it's just another Tuesday, c) Convince yourself that sleep is a social construct.",
-  "Stress levels are reaching Mount Everest proportions. You: a) Vent to friends and family, b) Hit the gym or meditate, c) Embrace the comfort of carbs and sugary treats.",
-  "Sleep? What's sleep? You’re more familiar with the campus library than your own bed. You: a) Try a sleep app, b) Invest in blackout curtains, c) Accept your fate and become a nocturnal creature.",
-  "Describe your typical day in emojis only. 📚😴🍕🎉 stressed? 🤔😂😭",
-  "Your ultimate stress-busting superpower is: a) Teleportation, b) Unlimited ice cream, c) Pause time.",
-  "Code Red! Stress overload! Your first move is: a) Deep breaths, b) Dance it out, c) Cuddle a cat.",
-  "You conquered stress like a boss! Your secret weapon was: a) Planning, b) Willpower, c) Luck.",
-  "If you could snap your fingers and change one thing about college life to decrease stress, what would it be?"
+  {
+    question: "Pop quiz! Three exams and a massive paper land on your doorstep the same week. Do you?",
+    options: [
+      { text: "Embrace the chaos", value: "embrace_chaos" },
+      { text: "Strategically plan your survival", value: "plan_survival" },
+      { text: "Hide under the covers and hope it all goes away", value: "hide_away" },
+    ],
+  },
+  {
+    question: "That essay you poured your heart and soul into gets a grade that resembles your bank account balance after spring break. Your reaction:",
+    options: [
+      { text: "Professor feedback is my fuel!", value: "feedback_fuel" },
+      { text: "Time to drown my sorrows in pizza (and maybe revise later)", value: "pizza_revise" },
+      { text: "Question the meaning of life (and grading rubrics)", value: "question_life" },
+    ],
+  },
+  {
+    question: "Lost in lecture? Decoding ancient hieroglyphics would be easier than understanding this class. You:",
+    options: [
+      { text: "Form a study group and conquer together", value: "study_group" },
+      { text: "Hit up office hours and charm the professor", value: "office_hours" },
+      { text: "Accept your fate and hope for a curve", value: "accept_fate" },
+    ],
+  },
+  {
+    question: "Laptop meltdown! Right before a major deadline, your trusty tech companion decides to take an unscheduled vacation. You:",
+    options: [
+      { text: "Crowdfund a new one on campus", value: "crowdfund_laptop" },
+      { text: "Become best friends with the library computers", value: "library_computers" },
+      { text: "Embrace the handwritten life (and pray for legible handwriting)", value: "handwritten_life" },
+    ],
+  },
+  {
+    question: "Part-time job offer: Extra cash or extra study time? That is the question. You:",
+    options: [
+      { text: "Master the art of time management and become a multitasking ninja", value: "time_management" },
+      { text: "Sleep is for the weak (and the wealthy)", value: "sleep_weak" },
+      { text: "Prioritize academics and hope for a scholarship miracle", value: "prioritize_academics" },
+    ],
+  },
+  {
+    question: "FOMO alert! Everyone's at that party and you're stuck at home with a textbook. You:",
+    options: [
+      { text: "No biggie, my Netflix queue is calling my name", value: "netflix_queue" },
+      { text: "Crash the party and make a grand entrance", value: "crash_party" },
+      { text: "Wallow in self-pity and stalk everyone's Instagram stories", value: "wallow_pity" },
+    ],
+  },
+  {
+    question: "Roommate drama! Passive-aggressive sticky notes are now the primary form of communication. You:",
+    options: [
+      { text: "Call a roommate summit and establish house rules", value: "roommate_summit" },
+      { text: "Invest in noise-canceling headphones and a personal stash of snacks", value: "noise_canceling" },
+      { text: "Plot elaborate pranks involving glitter and rubber ducks", value: "plot_pranks" },
+    ],
+  },
+  {
+    question: "Running on fumes and fueled by caffeine. You resemble a zombie more than a student. You:",
+    options: [
+      { text: "Schedule some me time and recharge", value: "recharge_me_time" },
+      { text: "Embrace the chaos, it's just another Tuesday", value: "embrace_tuesday_chaos" },
+      { text: "Convince yourself that sleep is a social construct", value: "sleep_social_construct" },
+    ],
+  },
+  {
+    question: "Stress levels are reaching Mount Everest proportions. You:",
+    options: [
+      { text: "Vent to friends and family", value: "vent_friends_family" },
+      { text: "Hit the gym or meditate", value: "gym_meditate" },
+      { text: "Embrace the comfort of carbs and sugary treats", value: "carbs_treats" },
+    ],
+  },
+  {
+    question: "Sleep? What's sleep? You’re more familiar with the campus library than your own bed. You:",
+    options: [
+      { text: "Try a sleep app", value: "sleep_app" },
+      { text: "Invest in blackout curtains", value: "blackout_curtains" },
+      { text: "Accept your fate and become a nocturnal creature", value: "nocturnal_creature" },
+    ],
+  },
+  {
+    question: "Describe your typical day in emojis only. 📚😴🍕🎉 stressed? 🤔😂😭",
+    options: [
+      { text: "Stressful", value: "stressful_emojis" }, // Placeholder value
+      { text: "Balanced", value: "balanced_emojis" }, // Placeholder value
+      { text: "Relaxed", value: "relaxed_emojis" }, // Placeholder value
+    ],
+  },
+  {
+    question: "Your ultimate stress-busting superpower is:",
+    options: [
+      { text: "Teleportation", value: "teleportation" },
+      { text: "Unlimited ice cream", value: "unlimited_ice_cream" },
+      { text: "Pause time", value: "pause_time" },
+    ],
+  },
+  {
+    question: "Code Red! Stress overload! Your first move is:",
+    options: [
+      { text: "Deep breaths", value: "deep_breaths" },
+      { text: "Dance it out", value: "dance_it_out" },
+      { text: "Cuddle a cat", value: "cuddle_cat" },
+    ],
+  },
+  {
+    question: "You conquered stress like a boss! Your secret weapon was:",
+    options: [
+      { text: "Planning", value: "planning" },
+      { text: "Willpower", value: "willpower" },
+      { text: "Luck", value: "luck" },
+    ],
+  },
+  {
+    question: "If you could snap your fingers and change one thing about college life to decrease stress, what would it be?",
+    options: [
+      { text: "Less homework", value: "less_homework" }, // Placeholder value
+      { text: "More sleep", value: "more_sleep" }, // Placeholder value
+      { text: "Easier exams", value: "easier_exams" }, // Placeholder value
+    ],
+  },
 ];
 
 const AIChat = ({ onAssessmentComplete, stressAssessmentResult, isLoading, error }) => {
@@ -34,7 +139,8 @@ const AIChat = ({ onAssessmentComplete, stressAssessmentResult, isLoading, error
 
   const handleNextQuestion = () => {
     const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQuestionIndex].answer = currentInput;
+    // For multiple choice, we'll update this to store the selected option's value
+    updatedAnswers[currentQuestionIndex].answer = currentInput; // This will need adjustment for multiple choice
     setUserAnswers(updatedAnswers);
     setCurrentInput('');
 
