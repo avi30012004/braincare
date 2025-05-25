@@ -1,57 +1,76 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-// import { Client, Databases } from 'appwrite'; // Keeping this commented out as Appwrite is not used in this version
 
-export default async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   const { assessmentData, clerkUserId } = req.body;
 
-  // Basic data validation
+  // Input validation
   if (!assessmentData || !Array.isArray(assessmentData) || !clerkUserId) {
-    return res.status(400).json({ error: 'Missing or invalid assessmentData or clerkUserId in request body.' });
+    return res.status(400).json({ error: 'Missing or invalid assessmentData or clerkUserId.' });
   }
 
-  // Construct the prompt for the Gemini API
-  let prompt = "Analyze the following stress assessment answers from a college student and provide a stress level (Low, Moderate, High, Critical), a summary of their stress factors, and actionable recommendations to manage their stress. Provide the response in a JSON format with the keys 'stressLevel', 'summary', and 'recommendations' (an array of strings). Do not include any other text outside the JSON.\n\nStress Assessment Answers:\n";
+  // Prepare prompt
+  let prompt = `
+Analyze the following stress assessment answers from a college student.
+Provide:
+- Stress level (Low, Moderate, High, Critical)
+- Summary of stress factors
+- Actionable recommendations
+
+Respond in strict JSON format with:
+{
+  "stressLevel": "string",
+  "summary": "string",
+  "recommendations": ["string", ...]
+}
+
+Answers:
+`;
 
   assessmentData.forEach((item, index) => {
-    prompt += `Question ${index + 1}: ${item.question}\n`;
-    prompt += `Answer: ${item.answer}\n\n`;
+    prompt += `Question ${index + 1}: ${item.question}\nAnswer: ${item.answer}\n\n`;
   });
 
   try {
-    // Initialize the Google Generative AI client
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
-    // Generate content using the Gemini API
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
+    const rawText = response.text().trim();
 
-    // Attempt to parse the JSON response from Gemini
+    // Clean markdown fences if present
+    let cleanedText = rawText;
+    if (cleanedText.startsWith("```")) {
+      cleanedText = cleanedText.replace(/^```(?:json)?\n?/, '').replace(/```$/, '').trim();
+    }
+
     let geminiResponse;
     try {
-      geminiResponse = JSON.parse(text);
+      geminiResponse = JSON.parse(cleanedText);
     } catch (jsonError) {
-      console.error('Failed to parse Gemini response as JSON:', text, jsonError);
-      return res.status(500).json({ error: 'Failed to parse Gemini response as JSON.', rawResponse: text });
+      console.error('Failed to parse Gemini response as JSON:', cleanedText);
+      return res.status(500).json({ error: 'Failed to parse Gemini response as JSON.', rawResponse: cleanedText });
     }
 
-    // Validate the structure of the Gemini response
-    if (!geminiResponse || typeof geminiResponse.stressLevel !== 'string' || typeof geminiResponse.summary !== 'string' || !Array.isArray(geminiResponse.recommendations)) {
-         console.error('Unexpected Gemini response structure:', geminiResponse);
-         return res.status(500).json({ error: 'Unexpected response structure from Gemini.', geminiResponse });
+    // Validate JSON structure
+    const { stressLevel, summary, recommendations } = geminiResponse;
+    if (
+      typeof stressLevel !== 'string' ||
+      typeof summary !== 'string' ||
+      !Array.isArray(recommendations)
+    ) {
+      console.error('Invalid response format:', geminiResponse);
+      return res.status(500).json({ error: 'Invalid Gemini response format.', geminiResponse });
     }
 
-
-    // Return the stress assessment report
-    res.status(200).json({ stressAssessment: { result: geminiResponse } });
+    return res.status(200).json({ stressAssessment: { result: geminiResponse } });
 
   } catch (error) {
-    console.error('Error processing request:', error);
-    res.status(500).json({ error: 'Error analyzing stress.', details: error.message });
+    console.error('Error analyzing stress:', error);
+    return res.status(500).json({ error: 'Error analyzing stress.', details: error.message });
   }
-};
+}
