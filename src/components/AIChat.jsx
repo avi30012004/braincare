@@ -37,7 +37,7 @@ const AIChat = () => {
   const [assessmentComplete, setAssessmentComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [stressAssessmentResult, setStressAssessmentResult] = useState(null);
+  const [stressAssessmentResult, setStressAssessmentResult] = useState(null); // Keep for displaying result
 
   const handleInputChange = (event) => {
     setCurrentInput(event.target.value);
@@ -56,51 +56,22 @@ const AIChat = () => {
     } else {
       // Last question answered, trigger assessment
       setAssessmentComplete(true);
-      analyzeStress(updatedAnswers);
+      // Removed the call to analyzeStress here.
+      // The parent component or another part of your application
+      // should now handle sending the userAnswers to the backend.
     }
   };
 
-  const analyzeStress = async (answers) => {
-    setIsLoading(true);
-    setError(null);
-    setStressAssessmentResult(null);
+  // Removed the analyzeStress function entirely.
 
-    try {
-      const assessmentData = stressQuestions.map((question, index) => ({
-        question: question,
-        answer: answers[index],
-      }));
-
-      const response = await fetch('/api/analyzeStress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },        
-        body: JSON.stringify({ assessmentData: assessmentData, clerkUserId: 'test_user_' + Date.now() }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Failed to fetch stress assessment');
-      }
-
-      setStressAssessmentResult(data.stressAssessment.result);
-    } catch (err) {
-      console.error("Error analyzing stress:", err);
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Calculate stress meter percentage (using a simple mapping for demo)
-  const stressLevelToPercentage = stressAssessmentResult ? 
+  // Helper function to calculate stress meter percentage (using a simple mapping for demo)
+  const stressLevelToPercentage = stressAssessmentResult ?
     (stressAssessmentResult.stressLevel === 'Low' ? '25%' :
      stressAssessmentResult.stressLevel === 'Moderate' ? '50%' :
      stressAssessmentResult.stressLevel === 'High' ? '75%' :
      stressAssessmentResult.stressLevel === 'Critical' ? '100%' : '0%')
     : '0%';
+
 
   return (
     <div className='min-h-screen bg-n-8 flex flex-col items-center px-5 lg:px-10 py-10'>
@@ -113,8 +84,8 @@ const AIChat = () => {
 
         {/* Stress Meter Placeholder */}
         <div className='w-full bg-n-7 h-2 rounded-full mt-4 mb-8'>
-          <div 
-            className='bg-color-1 h-full rounded-full transition-all duration-500 ease-in-out' 
+          <div
+            className='bg-color-1 h-full rounded-full transition-all duration-500 ease-in-out'
             style={{ width: stressLevelToPercentage }}
           ></div>
         </div>
@@ -124,7 +95,7 @@ const AIChat = () => {
             <div className='mb-4'>
               {/* Bot Message (Question) */}
               <div className='flex justify-start items-start mb-4'>
-                <div className='bg-n-6 rounded-xl p-3 text-n-1 max-w-[80%]'>
+                <div className='bg-n-6 rounded-xl p-3 text-n-1 max-w-[80%]\'>
                   <p className='text-xs text-n-1/50'>Healbot</p>
                   <p className='font-code'>{stressQuestions[currentQuestionIndex]}</p>
                 </div>
@@ -136,11 +107,11 @@ const AIChat = () => {
                   <input
                     type='text'
                     placeholder='Type your answer here...'
-                    className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1'
+                    className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1\'
                     value={currentInput}
                     onChange={handleInputChange}
                     onKeyPress={(event) => { if (event.key === 'Enter') handleNextQuestion(); }}
-                    disabled={isLoading} // Disable input while analyzing
+                    disabled={isLoading} // Keep isLoading for UI feedback if needed by parent
                   />
                 </div>
               </div>
@@ -148,10 +119,10 @@ const AIChat = () => {
 
             {/* Navigation Button */}
             <div className='w-full text-center mt-6'>
-              <button 
-                onClick={handleNextQuestion} 
-                disabled={isLoading || currentInput.trim() === ''}
-                className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors disabled:opacity-50 font-code'
+              <button
+                onClick={handleNextQuestion}
+                disabled={isLoading || currentInput.trim() === ''} // Keep isLoading for UI feedback
+                className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors disabled:opacity-50 font-code\'
               >
                 {currentQuestionIndex < stressQuestions.length - 1 ? 'Next Question' : 'Get Assessment'}
               </button>
@@ -161,9 +132,9 @@ const AIChat = () => {
         ) : (
           // Assessment Complete - Display Results
           <div className='flex-1 overflow-y-auto py-8 px-10'>
-            {isLoading ? (
+            {isLoading ? ( // Keep isLoading for UI feedback
               <div className='text-center text-n-1 font-code'>Analyzing your responses...</div>
-            ) : error ? (
+            ) : error ? ( // Keep error for displaying potential errors from parent
               <div className='text-center text-red-500 font-code'>Error: {error}</div>
             ) : stressAssessmentResult && (
               <div className='w-full px-10 py-8 mt-4 bg-n-7 rounded-lg text-n-1'>
@@ -180,15 +151,16 @@ const AIChat = () => {
                 </div>
                 {/* Optional: Add a button to restart the assessment */}
                 <div className='w-full text-center mt-6'>
-                    <button 
-                        onClick={() => { 
+                    <button
+                        onClick={() => {
                             setCurrentQuestionIndex(0);
                             setUserAnswers(Array(stressQuestions.length).fill(''));
                             setCurrentInput('');
                             setAssessmentComplete(false);
-                            setStressAssessmentResult(null);
+                            setStressAssessmentResult(null); // Reset result
+                            setError(null); // Reset error
                         }}
-                        className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors font-code'
+                        className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors font-code\'
                     >
                         Restart Assessment
                     </button>
@@ -199,10 +171,10 @@ const AIChat = () => {
         )}
 
         {/* Optional: Keep the general chat input if you want a hybrid mode later */}
-        {/* 
+        {/*
         <div className='p-6 border-t border-n-6'>
           <div className='flex items-center space-x-4'>
-            <input type='text' placeholder='Share your thoughts...' className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1' />
+            <input type='text' placeholder='Share your thoughts...' className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1\' />
             <button className='px-4 py-2 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors'>
               <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 19l9 2-9-18-9 18 9-2zm0 0v-8' /></svg>
             </button>
