@@ -15,8 +15,8 @@ export default async function handler(req, res) {
   // Prepare prompt
   let prompt = `
 Analyze the following stress assessment answers from a college student.
-Provide:
-- Stress level (Low, Moderate, High, Critical)
+Based on the answers, identify and provide:
+- Overall Stress level (Low, Moderate, High, Critical)
 - Summary of stress factors
 - Actionable recommendations
 
@@ -25,7 +25,7 @@ Respond in strict JSON format with:
   "stressLevel": "string",
   "summary": "string",
   "recommendations": ["string", ...]
-}
+}. The 'summary' field should be a detailed breakdown of the identified stress factors, categorized (e.g., Academic, Social, Personal, Environmental), and the 'recommendations' should be specific and personalized based on the identified stress factors.
 
 Answers:
 `;
