@@ -1,354 +1,214 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
+// Define your stress assessment questions here
 const stressQuestions = [
-  {
-    category: "School",
-    question: "Mega quiz attack! You have three tests and a huge paper due the same week. What do you do?",
-    options: [
-      { text: "a) Go with the flow – stress is for losers! (Maybe drink lots of soda.)", value: "a" },
-      { text: "b) Plan everything out – make a schedule, pull some all-nighters.", value: "b" },
-      { text: "c) Hide – maybe it will all magically disappear? (It won't.)", value: "c" },
-    ]
-  },
-  {
-    category: "School",
-    question: "Essay fail: Your amazing paper gets a bad grade. How do you react?",
-    options: [
-      { text: "a) Use the teacher's comments to make it better!", value: "a" },
-      { text: "b) Eat pizza and worry about it later.", value: "b" },
-      { text: "c) Freak out and question everything.", value: "c" },
-    ]
-  },
-  {
-    category: "School",
-    question: "Lost in class? The teacher might as well be speaking another language. You:",
-    options: [
-      { text: "a) Form a study group with your friends.", value: "a" },
-      { text: "b) Go to the teacher's office for help.", value: "b" },
-      { text: "c) Hope everyone else does badly so you don't look so bad.", value: "c" },
-    ]
-  },
-  {
-    category: "Money",
-    question: "Laptop disaster! Your computer breaks right before a big deadline. You:",
-    options: [
-      { text: "a) Ask people for money to buy a new one.", value: "a" },
-      { text: "b) Live at the library and use their computers.", value: "b" },
-      { text: "c) Write everything by hand and hope it's readable.", value: "c" },
-    ]
-  },
-  {
-    category: "Money",
-    question: "Part-time job offer: More money or more study time?",
-    options: [
-      { text: "a) Become a super-multitasker and do both!", value: "a" },
-      { text: "b) Forget sleep – I need the money!", value: "b" },
-      { text: "c) Focus on school and hope for a scholarship.", value: "c" },
-    ]
-  },
-  {
-    category: "Friends & Roommates",
-    question: "Fear of missing out! Everyone's at a party, but you have to study. You:",
-    options: [
-      { text: "a) Chill at home with Netflix – no big deal.", value: "a" },
-      { text: "b) Show up late and surprise everyone!", value: "b" },
-      { text: "c) Feel sorry for yourself and stalk everyone on Instagram.", value: "c" },
-    ]
-  },
-  {
-    category: "Friends & Roommates",
-    question: "Roommate trouble! You only communicate through angry sticky notes. You:",
-    options: [
-      { text: "a) Have a serious talk with your roommate.", value: "a" },
-      { text: "b) Hide in your room with snacks and headphones.", value: "b" },
-      { text: "c) Plan a funny prank to get back at them.", value: "c" },
-    ]
-  },
-  {
-    category: "Taking Care of Yourself",
-    question: "You're tired and wired on caffeine. You look like:",
-    options: [
-      { text: "a) A normal, slightly tired student.", value: "a" },
-      { text: "b) A zombie.", value: "b" },
-      { text: "c) Someone who doesn't need sleep (or food).", value: "c" },
-    ]
-  },
-  {
-    category: "Taking Care of Yourself",
-    question: "Super stressed! What do you do?",
-    options: [
-      { text: "a) Talk to friends, family, or a counselor.", value: "a" },
-      { text: "b) Do yoga, meditate, or take deep breaths.", value: "b" },
-      { text: "c) Eat lots of cookies and ice cream.", value: "c" },
-    ]
-  },
-  {
-    category: "Taking Care of Yourself",
-    question: "Sleep? What's that? You practically live at the library. You:",
-    options: [
-      { text: "a) Use a sleep app with calming sounds.", value: "a" },
-      { text: "b) Make your room super dark and quiet so you can sleep.", value: "b" },
-      { text: "c) Become a night owl and own it.", value: "c" },
-    ]
-  },
-  {
-    category: "Stress in General",
-    question: "Show your typical day as a college student using emojis:",
-    options: [] // This question will have a text input
-  },
-  {
-    category: "Stress in General",
-    question: "If you had a superpower to fight stress, it would be:",
-    options: [
-      { text: "a) Teleporting to a deserted island.", value: "a" },
-      { text: "b) Having unlimited ice cream and comfy socks.", value: "b" },
-      { text: "c) The ability to stop time.", value: "c" },
-    ]
-  },
-  {
-    category: "Stress in General",
-    question: "Stress emergency! What do you do first?",
-    options: [
-      { text: "a) Take deep breaths and tell yourself \"I can do this!\"", value: "a" },
-      { text: "b) Play loud music and dance.", value: "b" },
-      { text: "c) Cuddle with a cat.", value: "c" },
-    ]
-  },
-  {
-    category: "Stress in General",
-    question: "You beat a stressful situation! How did you do it?",
-    options: [
-      { text: "a) Careful planning and hard work.", value: "a" },
-      { text: "b) Never giving up!", value: "b" },
-      { text: "c) Pure luck.", value: "c" },
-    ]
-  },
-  {
-    category: "Stress in General",
-    question: "Snap your fingers! One thing you'd change about college to make it less stressful:",
-    options: [] // This question will have a text input
-  },
+  // Academics
+  "Pop quiz! Three exams and a massive paper land on your doorstep the same week. Do you: a) Embrace the chaos, b) Strategically plan your survival, c) Hide under the covers and hope it all goes away?",
+  "That essay you poured your heart and soul into gets a grade that resembles your bank account balance after spring break. Your reaction: a) Professor feedback is my fuel! b) Time to drown my sorrows in pizza (and maybe revise later), c) Question the meaning of life (and grading rubrics).",
+  "Lost in lecture? Decoding ancient hieroglyphics would be easier than understanding this class. You: a) Form a study group and conquer together, b) Hit up office hours and charm the professor, c) Accept your fate and hope for a curve.",
+
+  // Finances
+  "Laptop meltdown! Right before a major deadline, your trusty tech companion decides to take an unscheduled vacation. You: a) Crowdfund a new one on campus, b) Become best friends with the library computers, c) Embrace the handwritten life (and pray for legible handwriting).",
+  "Part-time job offer: Extra cash or extra study time? That is the question. You: a) Master the art of time management and become a multitasking ninja, b) Sleep is for the weak (and the wealthy), c) Prioritize academics and hope for a scholarship miracle.",
+
+  // Social Life and Relationships
+  "FOMO alert! Everyone's at that party and you're stuck at home with a textbook. You: a) No biggie, my Netflix queue is calling my name, b) Crash the party and make a grand entrance, c) Wallow in self-pity and stalk everyone's Instagram stories.",
+  "Roommate drama! Passive-aggressive sticky notes are now the primary form of communication. You: a) Call a roommate summit and establish house rules, b) Invest in noise-canceling headphones and a personal stash of snacks, c) Plot elaborate pranks involving glitter and rubber ducks.",
+
+  // Physical and Mental Well-being
+  "Running on fumes and fueled by caffeine. You resemble a zombie more than a student. You: a) Schedule some me time and recharge, b) Embrace the chaos, it's just another Tuesday, c) Convince yourself that sleep is a social construct.",
+  "Stress levels are reaching Mount Everest proportions. You: a) Vent to friends and family – a problem shared is a problem halved, b) Hit the gym or find a quiet corner to meditate, c) Embrace the comfort of carbs and sugary treats.",
+  "Sleep? What's sleep? You’re more familiar with the campus library than your own bed. You: a) Try a sleep app and discover the magic of white noise, b) Invest in blackout curtains and earplugs – create a sleep sanctuary, c) Accept your fate and become a nocturnal creature.",
+
+  // General Stress and Coping
+  "Describe your typical day in the life of a college student using emojis only. 📚😴🍕🎉 stressed? 🤔😂😭",
+  "Your ultimate stress-busting superpower is: a) The ability to teleport to a deserted island, b) Unlimited access to ice cream and fuzzy socks, c) The power to pause time.",
+  "Code Red! Stress overload! Your first move is: a) Deep breaths and a calming mantra, b) Blast your favorite music and dance it out, c) Find the nearest cat and cuddle.",
+  "You conquered a stressful situation like a boss! Your secret weapon was: a) Careful planning and strategic execution, b) Sheer willpower and a never-give-up attitude, c) A healthy dose of luck and a sprinkle of divine intervention.",
+  "If you could snap your fingers and change one thing about college life to decrease stress, what would it be?"
+
+  // Note: The follow-up questions were removed to match the length of the new questions provided.
 ];
 
 const AIChat = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState(Array(stressQuestions.length).fill(null));
+  const [userAnswers, setUserAnswers] = useState(Array(stressQuestions.length).fill(''));
+  const [currentInput, setCurrentInput] = useState('');
+  const [assessmentComplete, setAssessmentComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [stressAssessmentResult, setStressAssessmentResult] = useState(null);
 
-  const handleOptionSelect = (value) => {
-    const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQuestionIndex] = value;
-    setUserAnswers(updatedAnswers);
+  const handleInputChange = (event) => {
+    setCurrentInput(event.target.value);
   };
 
-  const handleTextAnswerChange = (e) => {
+  const handleNextQuestion = () => {
     const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQuestionIndex] = e.target.value;
+    updatedAnswers[currentQuestionIndex] = currentInput;
     setUserAnswers(updatedAnswers);
-  };
+    setCurrentInput(''); // Clear input for next question
 
-  const handleNext = () => {
     if (currentQuestionIndex < stressQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      // Optionally, pre-fill input if user already answered this question in a previous session
+      // setCurrentInput(userAnswers[currentQuestionIndex + 1] || '');
     } else {
-      analyzeStress(userAnswers);
+      // Last question answered, trigger assessment
+      setAssessmentComplete(true);
+      analyzeStress(updatedAnswers);
     }
-  };
-
-  const restartAssessment = () => {
-    setCurrentQuestionIndex(0);
-    setUserAnswers(Array(stressQuestions.length).fill(null));
-    setStressAssessmentResult(null);
-    setError(null);
   };
 
   const analyzeStress = async (answers) => {
     setIsLoading(true);
     setError(null);
-    
-    const assessmentData = stressQuestions.map((question, index) => ({
-      question: question.question,
-      answer: answers[index]
-    }));
+    setStressAssessmentResult(null);
 
     try {
-      console.log('Making request to Vercel function with assessment data...');
-      console.log('Assessment Data:', assessmentData);
-
+      const assessmentData = stressQuestions.map((question, index) => ({
+        question: question,
+        answer: answers[index],
+      }));
 
       const response = await fetch('/api/analyzeStress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          testAnswers: answers,
-          assessmentData: assessmentData,
-          clerkUserId: 'test_user_' + Date.now()
-        }),
+        },        
+        body: JSON.stringify({ assessmentData: assessmentData, clerkUserId: 'test_user_' + Date.now() }),
       });
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers));
-      
-      const data = await response.json();
-      console.log('Full API Response:', data);
-      
-      if (data.success && data.stressAssessment && data.stressAssessment.result) {
-        setStressAssessmentResult(data.stressAssessment.result);
-      } else {
-           level === 'High' ? '75%' :
-           level === 'Critical' ? '100%' : '0%';
-  };
 
-  const stressLevelToColor = (level) => {
-    return level === 'Low' ? 'bg-green-500' :
-           level === 'Moderate' ? 'bg-yellow-500' :
-           level === 'High' ? 'bg-orange-500' :
-        console.error('Unexpected response structure:', data);
-        throw new Error('Invalid response structure from function');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Failed to fetch stress assessment');
       }
 
+      setStressAssessmentResult(data.stressAssessment.result);
     } catch (err) {
-      console.error('Error analyzing stress:', err);
-      setError(`Error: ${err.message}`);
+      console.error("Error analyzing stress:", err);
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const currentQuestion = stressQuestions[currentQuestionIndex];
-
-  const stressLevelToPercentage = (level) => {
-    return level === 'Low' ? '25%' :
-           level === 'Moderate' ? '50%' :
-           level === 'High' ? '75%' :
-           level === 'Critical' ? '100%' : '0%';
-  };
-
-  const stressLevelToColor = (level) => {
-           level === 'Critical' ? 'bg-red-500' : 'bg-gray-500';
-  };
+  // Calculate stress meter percentage (using a simple mapping for demo)
+  const stressLevelToPercentage = stressAssessmentResult ? 
+    (stressAssessmentResult.stressLevel === 'Low' ? '25%' :
+     stressAssessmentResult.stressLevel === 'Moderate' ? '50%' :
+     stressAssessmentResult.stressLevel === 'High' ? '75%' :
+     stressAssessmentResult.stressLevel === 'Critical' ? '100%' : '0%')
+    : '0%';
 
   return (
-    <div className='min-h-screen bg-gray-100 flex flex-col items-center px-5 py-10'>
-      <div className='w-full max-w-4xl bg-white rounded-lg shadow-lg p-6'>
-        {isLoading ? (
-          <div className='text-center'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4'></div>
-            <p className='text-lg'>Analyzing your answers...</p>
-          </div>
-        ) : stressAssessmentResult ? (
-          <div>
-            <h2 className='text-3xl font-bold mb-6 text-center'>Assessment Result</h2>
-            
-            <div className='bg-gray-50 p-6 rounded-lg mb-6'>
-              <h3 className='text-xl font-semibold mb-3'>Stress Level: {stressAssessmentResult.stressLevel}</h3>
-              <div className='w-full bg-gray-200 h-6 rounded-full mb-4'>
-                {stressAssessmentResult.stressLevel && (
- <div
- className={`h-6 rounded-full transition-all duration-500 ${stressLevelToColor(stressAssessmentResult.stressLevel)}`}
- style={{ width: stressLevelToPercentage(stressAssessmentResult.stressLevel) }}
- ></div>
- )}
+    <div className='min-h-screen bg-n-8 flex flex-col items-center px-5 lg:px-10 py-10'>
+      <div className='w-full max-w-7xl flex flex-col'>
+        {/* Chat Header */}
+        <div className='w-full px-10 py-8 border-b border-n-6'>
+          <h1 className='text-4xl lg:text-5xl font-bold text-n-1 font-code'>Healbot Stress Assessment</h1>
+          <p className='text-n-1/50'>Answer the questions below to get a stress assessment.</p>
+        </div>
+
+        {/* Stress Meter Placeholder */}
+        <div className='w-full bg-n-7 h-2 rounded-full mt-4 mb-8'>
+          <div 
+            className='bg-color-1 h-full rounded-full transition-all duration-500 ease-in-out' 
+            style={{ width: stressLevelToPercentage }}
+          ></div>
+        </div>
+
+        {!assessmentComplete ? (
+          <div className='flex-1 overflow-y-auto py-8 px-10'>
+            <div className='mb-4'>
+              {/* Bot Message (Question) */}
+              <div className='flex justify-start items-start mb-4'>
+                <div className='bg-n-6 rounded-xl p-3 text-n-1 max-w-[80%]'>
+                  <p className='text-xs text-n-1/50'>Healbot</p>
+                  <p className='font-code'>{stressQuestions[currentQuestionIndex]}</p>
+                </div>
+              </div>
+
+              {/* User Input */}
+              <div className='flex justify-end items-end'>
+                <div className='w-full'>
+                  <input
+                    type='text'
+                    placeholder='Type your answer here...'
+                    className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1'
+                    value={currentInput}
+                    onChange={handleInputChange}
+                    onKeyPress={(event) => { if (event.key === 'Enter') handleNextQuestion(); }}
+                    disabled={isLoading} // Disable input while analyzing
+                  />
+                </div>
               </div>
             </div>
 
-            {stressAssessmentResult.summary && (
-              <div className='mb-6'>
-                <h3 className='text-xl font-semibold mb-3'>Summary</h3>
-                <p className='text-gray-700 leading-relaxed'>{stressAssessmentResult.summary}</p>
-              </div>
-            )}
+            {/* Navigation Button */}
+            <div className='w-full text-center mt-6'>
+              <button 
+                onClick={handleNextQuestion} 
+                disabled={isLoading || currentInput.trim() === ''}
+                className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors disabled:opacity-50 font-code'
+              >
+                {currentQuestionIndex < stressQuestions.length - 1 ? 'Next Question' : 'Get Assessment'}
+              </button>
+            </div>
 
-            {stressAssessmentResult.recommendations && stressAssessmentResult.recommendations.length > 0 && (
-              <div className='mb-6'>
-                <h3 className='text-xl font-semibold mb-3'>Recommendations</h3>
-                <ul className='space-y-2'>
-                  {stressAssessmentResult.recommendations.map((rec, index) => (
-                    <li key={index} className='flex items-start'>
-                      <span className='text-blue-500 mr-2'>•</span>
-                      <span className='text-gray-700'>{rec}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {stressAssessmentResult.academicClassSchedules && (
-              <div className='mb-6'>
-                <h3 className='text-xl font-semibold mb-3'>Suggested Academic Schedule</h3>
-                <p className='text-gray-700 leading-relaxed'>{stressAssessmentResult.academicClassSchedules}</p>
-              </div>
-            )}
-
-            <button 
-              onClick={restartAssessment} 
-              className='w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors'
-            >
-              Take Assessment Again
-            </button>
           </div>
         ) : (
-          <div>
-            <div className='mb-4'>
-              <div className='flex justify-between items-center mb-2'>
-                <h2 className='text-xl font-semibold'>Question {currentQuestionIndex + 1} of {stressQuestions.length}</h2>
-                <div className='text-sm text-gray-500'>{currentQuestion.category}</div>
-              </div>
-              <div className='w-full bg-gray-200 h-2 rounded-full'>
-                <div 
-                  className='bg-blue-500 h-2 rounded-full transition-all duration-300'
-                  style={{ width: `${((currentQuestionIndex + 1) / stressQuestions.length) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <p className='text-lg mb-6'>{currentQuestion.question}</p>
-            
-            {currentQuestion.options.length > 0 ? (
-              <div className='space-y-3'>
-                {currentQuestion.options.map((opt, idx) => (
-                  <button
-                    key={idx}
-                    className={`block w-full text-left p-4 border-2 rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 ${
-                      userAnswers[currentQuestionIndex] === opt.value 
-                        ? 'border-blue-500 bg-blue-100' 
-                        : 'border-gray-200'
-                    }`}
-                    onClick={() => handleOptionSelect(opt.value)}
-                  >
-                    {opt.text}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <textarea
-                className='w-full border-2 border-gray-200 p-4 rounded-lg focus:border-blue-500 focus:outline-none resize-none'
-                rows={4}
-                placeholder='Type your answer here...'
-                value={userAnswers[currentQuestionIndex] || ''}
-                onChange={handleTextAnswerChange}
-              />
-            )}
-            
-            <button 
-              onClick={handleNext} 
-              disabled={!userAnswers[currentQuestionIndex]}
-              className='w-full mt-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors'
-            >
-              {currentQuestionIndex === stressQuestions.length - 1 ? 'Complete Assessment' : 'Next Question'}
-            </button>
-            
-            {error && (
-              <div className='mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg'>
-                <p className='font-semibold'>Error:</p>
-                <p>{error}</p>
+          // Assessment Complete - Display Results
+          <div className='flex-1 overflow-y-auto py-8 px-10'>
+            {isLoading ? (
+              <div className='text-center text-n-1 font-code'>Analyzing your responses...</div>
+            ) : error ? (
+              <div className='text-center text-red-500 font-code'>Error: {error}</div>
+            ) : stressAssessmentResult && (
+              <div className='w-full px-10 py-8 mt-4 bg-n-7 rounded-lg text-n-1'>
+                <h2 className='text-2xl font-bold mb-4 font-code'>Your Stress Assessment:</h2>
+                <p className='mb-2'><strong className='font-semibold'>Stress Level:</strong> {stressAssessmentResult.stressLevel}</p>
+                <p className='mb-2'><strong className='font-semibold'>Summary:</strong> {stressAssessmentResult.summary}</p>
+                <div>
+                  <strong className='font-semibold'>Recommendations:</strong>
+                  <ul className='list-disc list-inside ml-4 mt-1'>
+                    {stressAssessmentResult.recommendations && stressAssessmentResult.recommendations.map((rec, index) => (
+                      <li key={index}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+                {/* Optional: Add a button to restart the assessment */}
+                <div className='w-full text-center mt-6'>
+                    <button 
+                        onClick={() => { 
+                            setCurrentQuestionIndex(0);
+                            setUserAnswers(Array(stressQuestions.length).fill(''));
+                            setCurrentInput('');
+                            setAssessmentComplete(false);
+                            setStressAssessmentResult(null);
+                        }}
+                        className='px-6 py-3 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors font-code'
+                    >
+                        Restart Assessment
+                    </button>
+                </div>
               </div>
             )}
           </div>
         )}
+
+        {/* Optional: Keep the general chat input if you want a hybrid mode later */}
+        {/* 
+        <div className='p-6 border-t border-n-6'>
+          <div className='flex items-center space-x-4'>
+            <input type='text' placeholder='Share your thoughts...' className='w-full px-4 py-2 rounded-full bg-n-9 text-n-1 placeholder:text-n-1/50 focus:outline-none focus:ring-2 focus:ring-color-1' />
+            <button className='px-4 py-2 rounded-full bg-color-1 text-n-1 hover:bg-color-2 transition-colors'>
+              <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 19l9 2-9-18-9 18 9-2zm0 0v-8' /></svg>
+            </button>
+          </div>
+        </div>
+        */}
       </div>
     </div>
   );
