@@ -58,7 +58,7 @@ import {
     {
       id: "2",
       title: "HealBot",
-      url: "#healBot",
+      url: "/healbot",
     },
     {
       id: "3",
