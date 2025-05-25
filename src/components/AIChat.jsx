@@ -21,7 +21,10 @@ const stressQuestions = [
 
 const AIChat = ({ onAssessmentComplete, stressAssessmentResult, isLoading, error }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState(Array(stressQuestions.length).fill(''));
+  const [userAnswers, setUserAnswers] = useState(stressQuestions.map(question => ({
+    question: question,
+    answer: ''
+  })));
   const [currentInput, setCurrentInput] = useState('');
   const [assessmentComplete, setAssessmentComplete] = useState(false);
 
@@ -31,7 +34,7 @@ const AIChat = ({ onAssessmentComplete, stressAssessmentResult, isLoading, error
 
   const handleNextQuestion = () => {
     const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQuestionIndex] = currentInput;
+    updatedAnswers[currentQuestionIndex].answer = currentInput;
     setUserAnswers(updatedAnswers);
     setCurrentInput('');
 
@@ -40,8 +43,7 @@ const AIChat = ({ onAssessmentComplete, stressAssessmentResult, isLoading, error
     } else {
       setAssessmentComplete(true);
       // Create a temporary array with the last answer included for the API call
-      const finalAnswers = [...updatedAnswers];
-      onAssessmentComplete(finalAnswers);
+      onAssessmentComplete(updatedAnswers);
     }
   };
 
@@ -59,7 +61,10 @@ const AIChat = ({ onAssessmentComplete, stressAssessmentResult, isLoading, error
 
   const handleRestart = () => {
     setCurrentQuestionIndex(0);
-    setUserAnswers(Array(stressQuestions.length).fill(''));
+    setUserAnswers(stressQuestions.map(question => ({
+      question: question,
+      answer: ''
+    })));
     setCurrentInput('');
     setAssessmentComplete(false);
   };
