@@ -24,7 +24,7 @@ export default async (req, res) => {
   try {
     // Initialize the Google Generative AI client
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
     // Generate content using the Gemini API
     const result = await model.generateContent(prompt);
